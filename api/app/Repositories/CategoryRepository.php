@@ -2,8 +2,8 @@
 
 namespace App\Repositories;
 
-use App\Repositories\Contracts\CategoryRepositoryInterface;
 use App\Models\Category;
+use App\Repositories\Contracts\CategoryRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 
 class CategoryRepository implements CategoryRepositoryInterface
@@ -14,14 +14,17 @@ class CategoryRepository implements CategoryRepositoryInterface
     {
         $this->model = $category;
     }
+
     public function getAll(): Collection
     {
-        return $this->model->orderBy('nome')->get();
+        return $this->model->orderBy('title')->get();
     }
+
     public function getParentCategories(): Collection
     {
         return $this->model->whereNull('parent_id')->with(['children'])->orderBy('nome')->get();
     }
+
     public function find(int $id): ?Category
     {
         return $this->model->with(['parent', 'children'])->find($id);
@@ -31,13 +34,15 @@ class CategoryRepository implements CategoryRepositoryInterface
     {
         return $this->model->create($data);
     }
+
     public function update(int $id, array $data): Category|bool
     {
         $category = $this->model->find($id);
-        if (!$category) {
+        if (! $category) {
             return false;
         }
         $category->update($data);
+
         return $category;
     }
 
