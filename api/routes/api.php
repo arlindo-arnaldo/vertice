@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PostController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,14 @@ Route::prefix('v1')->group(function () {
         Route::post('create', 'store');
         Route::get('show/{id}', 'show');
         Route::patch('update/{id}', 'update');
-        Route::delete('delete/{id}','destroy');
+        Route::delete('delete/{id}', 'destroy');
+    });
+
+    Route::controller(PostController::class)->prefix('posts')->group(function () {
+        Route::get('/', 'index');
+        Route::post('/create', 'store');
+        Route::get('show/{id}', 'show');
+        Route::patch('update/{id}', 'update');
+        Route::delete('delete/{id}', 'destroy');
     });
 });

@@ -25,6 +25,11 @@ class PostRepository implements PostRepositoryInterface
         return $this->model->with(['categories'])->find($id);
     }
 
+    public function findBySlug(string $slug): ?Post
+    {
+        return $this->model->with(['categories'])->where('slug', $slug)->first();
+    }
+
     public function create(array $data): Post
     {
         return $this->model->create($data);
@@ -54,5 +59,10 @@ class PostRepository implements PostRepositoryInterface
     public function publishedPosts(): Collection
     {
         return $this->model->where('is_published', true)->get();
+    }
+
+    public function unpublishedPosts(): Collection
+    {
+        return $this->model->where('is_published', false)->get();
     }
 }

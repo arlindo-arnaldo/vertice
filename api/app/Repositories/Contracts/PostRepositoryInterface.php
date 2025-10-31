@@ -10,6 +10,7 @@ interface PostRepositoryInterface
     public function getAll(): Collection;
 
     public function find(int $id): ?Post;
+    public function findBySlug(string $slug): ?Post;
 
     public function create(array $data): Post;
 
@@ -20,4 +21,5 @@ interface PostRepositoryInterface
     public function featuredPosts(): Collection;
 
     public function publishedPosts(): Collection;
+    public function unpublishedPosts(): Collection;
 }
