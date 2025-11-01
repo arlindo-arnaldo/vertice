@@ -56,7 +56,7 @@ class PostController extends Controller
         try {
             $data = $request->validate([
                 'title' => 'required|unique:posts,title,'.$id,
-                'content' => 'required'
+                'content' => 'required',
             ]);
 
             $post = $this->postService->update($id, $data);

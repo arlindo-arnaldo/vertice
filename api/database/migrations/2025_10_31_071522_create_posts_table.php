@@ -19,6 +19,8 @@ return new class extends Migration
             $table->boolean('is_published')->default(true);
             $table->boolean('is_featured')->default(false);
             $table->string('thumb')->nullable();
+            $table->integer('claps')->unsigned()->default(0);
+            $table->text('resume')->nullable();
             $table->timestamps();
         });
     }
