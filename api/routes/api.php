@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ClapController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
 use App\Models\User;
@@ -41,4 +42,6 @@ Route::prefix('v1')->group(function () {
         Route::patch('update/{id}', 'update');
         Route::delete('delete/{id}', 'destroy');
     });
+
+    Route::post('/posts/add-clap/{id}', [ClapController::class, 'store']);
 });

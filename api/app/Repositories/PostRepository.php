@@ -22,7 +22,7 @@ class PostRepository implements PostRepositoryInterface
 
     public function find(int $id): ?Post
     {
-        return $this->model->with(['categories'])->find($id);
+        return $this->model->with(['categories'])->withCount('claps')->find($id);
     }
 
     public function findBySlug(string $slug): ?Post
