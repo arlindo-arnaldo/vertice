@@ -22,12 +22,12 @@ class PostRepository implements PostRepositoryInterface
 
     public function find(int $id): ?Post
     {
-        return $this->model->with(['categories'])->withCount('claps')->find($id);
+        return $this->model->with(['categories', 'comments'])->withCount('claps')->find($id);
     }
 
     public function findBySlug(string $slug): ?Post
     {
-        return $this->model->with(['categories'])->where('slug', $slug)->first();
+        return $this->model->with(['categories', 'comments'])->where('slug', $slug)->first();
     }
 
     public function create(array $data): Post
