@@ -9,9 +9,12 @@ class PostService
 {
     private $repository;
 
-    public function __construct(PostRepositoryInterface $repository)
+    private $aiService;
+
+    public function __construct(PostRepositoryInterface $repository, AiService $aiService)
     {
         $this->repository = $repository;
+        $this->aiService = $aiService;
     }
 
     public function getAll()
@@ -24,7 +27,10 @@ class PostService
 
         $data['slug'] = Str::slug($data['title']);
 
-        return $this->repository->create($data);
+        $post = $this->repository->create($data);
+        $this->aiService->summarize($post);
+
+        return $post;
     }
 
     public function findById($id)
