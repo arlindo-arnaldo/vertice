@@ -76,4 +76,18 @@ class PostController extends Controller
             return response()->json($th->getMessage(), 500);
         }
     }
+
+    public function simplifyText(Request $request)
+    {
+
+        $request->validate([
+            'text' => 'required',
+        ]);
+        try {
+            return response()->json($this->postService->simplifyText($request->text));
+        } catch (\Throwable $th) {
+            return response()->json($th->getMessage(), 500);
+        }
+
+    }
 }

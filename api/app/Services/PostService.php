@@ -74,4 +74,9 @@ class PostService
     {
         return $file->store();
     }
+
+    public function simplifyText(string $text)
+    {
+        return $this->aiService->simplifyText($text);
+    }
 }

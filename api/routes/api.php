@@ -34,6 +34,7 @@ Route::prefix('v1')->group(function () {
         Route::get('show/{id}', 'show');
         Route::patch('update/{id}', 'update');
         Route::delete('delete/{id}', 'destroy');
+        Route::post('/simplify-text', 'simplifyText');
     });
     Route::controller(CommentController::class)->prefix('comments')->group(function () {
         Route::get('/', 'index');
