@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Blog Moderno</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <!-- Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <!-- Estilos Personalizados do Dashboard -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+            background-color: var(--bs-tertiary-bg); /* Fundo padrão do admin */
+        }
+
+        .fw-900 { font-weight: 900; }
+
+        /* 1. Layout Principal (Sidebar + Conteúdo) */
+        .wrapper {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* 2. Sidebar */
+        .sidebar {
+            width: 260px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 1050;
+            background-color: var(--bs-body) !important; /* Reforçado para garantir que não seja transparente */
+            border-right: 1px solid var(--bs-border-color);
+            transition: transform 0.3s ease-in-out;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-brand {
+            font-weight: 900;
+            font-size: 1.75rem;
+            color: var(--bs-body-emphasis);
+            text-decoration: none;
+            padding: 0.5rem 0.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar .nav-link {
+            font-weight: 600;
+            color: var(--bs-secondary-color);
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-radius: 0.5rem;
+        }
+
+        .sidebar .nav-link i {
+            font-size: 1.25rem;
+            line-height: 1;
+        }
+        
+        .sidebar .nav-link:hover {
+            color: var(--bs-primary);
+            background-color: var(--bs-primary-subtle);
+        }
+
+        .sidebar .nav-link.active {
+            color: var(--bs-primary);
+            background-color: var(--bs-primary-subtle);
+        }
+
+        .sidebar-footer {
+            margin-top: auto; /* Empurra para o final */
+        }
+        
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1049;
+            display: none;
+            opacity: 0; /* Adicionado para transição suave */
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* 3. Conteúdo Principal */
+        .main-content {
+            flex-grow: 1;
+            padding-left: 260px; /* Espaço para a sidebar */
+            transition: padding-left 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 4. Topbar */
+        .topbar {
+            background-color: var(--bs-body) !important; /* Reforçado para garantir que não seja transparente */
+            border-bottom: 1px solid var(--bs-border-color);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-toggle {
+            display: none; /* Escondido em desktop */
+            font-size: 1.5rem;
+        }
+
+        .topbar-nav .nav-link {
+            color: var(--bs-secondary-color);
+        }
+
+        /* 5. Conteúdo da Página (Dashboard) */
+        .content-page {
+            padding: 2rem;
+        }
+
+        /* Cards de Estatísticas */
+        .stat-card {
+            border: 0;
+            border-radius: 0.75rem;
+            box-shadow: var(--bs-box-shadow-sm);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            padding: 1.5rem;
+            gap: 1rem;
+        }
+        
+        .stat-card .stat-icon {
+            font-size: 2rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            color: #fff;
+        }
+
+        /* Estilo genérico para cards e tabelas */
+        .admin-card {
+            border: 0;
+            border-radius: 0.75rem;
+            box-shadow: var(--bs-box-shadow-sm);
+            background-color: var(--bs-body);
+        }
+        
+        .admin-card .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid var(--bs-border-color);
+            font-weight: 700;
+        }
+        
+        .chart-placeholder {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bs-tertiary-bg);
+            border-radius: 0.5rem;
+            color: var(--bs-secondary-color);
+            font-style: italic;
+        }
+        
+        .table {
+            vertical-align: middle;
+        }
+
+        /* 6. Responsividade */
+        @media (max-width: 991.98px) {
+            .sidebar {
+                transform: translateX(-100%); /* Esconde sidebar */
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+                box-shadow: var(--bs-box-shadow-lg);
+            }
+            
+            .sidebar-overlay.active {
+                display: block;
+                opacity: 1; /* Ativa a opacidade */
+            }
+
+            .main-content {
+                padding-left: 0; /* Remove espaço da sidebar */
+            }
+            
+            .sidebar-toggle {
+                display: block; /* Mostra o botão hamburguer */
+            }
+        }
+        
+        /* Ícone do Toggle de Tema */
+        #theme-toggle .bi { display: none; }
+        html[data-bs-theme="light"] #theme-toggle .bi-sun-fill { display: inline-block; }
+        html[data-bs-theme="dark"] #theme-toggle .bi-moon-stars-fill { display: inline-block; }
+
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <!-- 1. SIDEBAR -->
+        <nav class="sidebar">
+            <div>
+                <a class="sidebar-brand" href="admin.html">
+                    <i class="bi bi-shield-lock-fill me-2"></i>
+                    BlogAdmin
+                </a>
+
+                <ul class="nav nav-pills flex-column gap-1">
+                    <li class="nav-item">
+                        <a href="admin.html" class="nav-link active" aria-current="page">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="bi bi-file-earmark-text"></i> Posts
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="bi bi-chat-dots"></i> Comentários
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="bi bi-people"></i> Usuários
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="bi bi-gear"></i> Configurações
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                <ul class="nav nav-pills flex-column">
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <i class="bi bi-box-arrow-left"></i> Ver Site
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Overlay para fechar sidebar no mobile -->
+        <div class="sidebar-overlay"></div>
+
+        <!-- 2. CONTEÚDO PRINCIPAL (TOPBAR + PÁGINA) -->
+        <div class="main-content">
+            
+            <!-- A. TOPBAR -->
+            <header class="topbar">
+                <!-- Botão Hamburguer (Mobile) -->
+                <button class="btn btn-link sidebar-toggle p-0" type="button">
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <!-- Busca (Opcional) -->
+                <form class="d-none d-md-inline-block" role="search">
+                    <input class="form-control form-control-sm" type="search" placeholder="Buscar..." aria-label="Buscar">
+                </form>
+
+                <!-- Menu da Direita -->
+                <ul class="nav align-items-center topbar-nav">
+                    <li class="nav-item">
+                        <button class="btn btn-link nav-link p-2" id="theme-toggle" type="button" aria-label="Toggle theme">
+                            <i class="bi bi-sun-fill fs-5"></i>
+                            <i class="bi bi-moon-stars-fill fs-5"></i>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link p-2">
+                            <i class="bi bi-bell fs-5"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link p-2 dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="https://placehold.co/40x40/ccc/333?text=A" alt="Avatar" class="rounded-circle me-2" width="32" height="32" onerror="this.src='https://placehold.co/40x40';this.onerror=null;">
+                            <span class="d-none d-md-inline">Admin</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3">
+                            <li><a class="dropdown-item" href="#">Perfil</a></li>
+                            <li><a class="dropdown-item" href="#">Configurações</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="login.html">Sair</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </header>
+
+            <!-- B. CONTEÚDO DA PÁGINA -->
+            <main class="content-page">
+                <h1 class="h2 fw-bold mb-4">Dashboard</h1>
+
+                <!-- Cards de Estatísticas -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="stat-card bg-body">
+                            <div class="stat-icon bg-primary">
+                                <i class="bi bi-file-earmark-text"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted mb-1">Total de Posts</h6>
+                                <h3 class="fw-bold mb-0">1.280</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="stat-card bg-body">
+                            <div class="stat-icon bg-success">
+                                <i class="bi bi-chat-dots"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted mb-1">Comentários</h6>
+                                <h3 class="fw-bold mb-0">345</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="stat-card bg-body">
+                            <div class="stat-icon bg-warning text-dark">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted mb-1">Usuários</h6>
+                                <h3 class="fw-bold mb-0">4.502</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="stat-card bg-body">
+                            <div class="stat-icon bg-danger">
+                                <i class="bi bi-bar-chart-line"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted mb-1">Visitas (30d)</h6>
+                                <h3 class="fw-bold mb-0">120.4k</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráficos -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-8">
+                        <div class="admin-card">
+                            <div class="card-header">
+                                Visão Geral de Tráfego
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-placeholder">
+                                    [Placeholder para Gráfico de Linha]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="admin-card">
+                            <div class="card-header">
+                                Fontes de Tráfego
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-placeholder">
+                                    [Placeholder para Gráfico de Pizza]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabela de Posts Recentes -->
+                <div class="admin-card">
+                    <div class="card-header">
+                        Posts Recentes
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Título</th>
+                                        <th scope="col">Autor</th>
+                                        <th scope="col">Categoria</th>
+                                        <th scope="col">Data</th>
+                                        <th scope="col">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-bold">Dominando as Novas Viewport Units</td>
+                                        <td>Bruno Ramos</td>
+                                        <td><span class="badge bg-success-subtle text-success-emphasis rounded-pill">CSS</span></td>
+                                        <td>22/10/2025</td>
+                                        <td>
+                                            <a href="#" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil-fill"></i></a>
+                                            <a href="#" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash-fill"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">5 Padrões de Design em JavaScript</td>
+                                        <td>Ana Silva</td>
+                                        <td><span class="badge bg-warning-subtle text-warning-emphasis rounded-pill">JavaScript</span></td>
+                                        <td>20/10/2025</td>
+                                        <td>
+                                            <a href="#" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil-fill"></i></a>
+                                            <a href="#" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash-fill"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">O Guia Definitivo para Core Web Vitals</td>
+                                        <td>Carla Ribeiro</td>
+                                        <td><span class="badge bg-info-subtle text-info-emphasis rounded-pill">Performance</span></td>
+                                        <td>18/10/2025</td>
+                                        <td>
+                                            <a href="#" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil-fill"></i></a>
+                                            <a href="#" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash-fill"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Introdução ao Docker para Frontend</td>
+                                        <td>Bruno Ramos</td>
+                                        <td><span class="badge bg-danger-subtle text-danger-emphasis rounded-pill">DevOps</span></td>
+                                        <td>15/10/2025</td>
+                                        <td>
+                                            <a href="#" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil-fill"></i></a>
+                                            <a href="#" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash-fill"></i></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <!-- Scripts (Dark Mode + Sidebar Toggle) -->
+    <script>
+        (() => {
+            'use strict';
+
+            // --- Script de Toggle de Tema (Dark Mode) ---
+            const getStoredTheme = () => localStorage.getItem('theme');
+            const setStoredTheme = theme => localStorage.setItem('theme', theme);
+
+            const getPreferredTheme = () => {
+                const storedTheme = getStoredTheme();
+                if (storedTheme) {
+                    return storedTheme;
+                }
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            };
+
+            const setTheme = theme => {
+                document.documentElement.setAttribute('data-bs-theme', theme);
+            };
+
+            setTheme(getPreferredTheme());
+
+            const themeToggleButton = document.getElementById('theme-toggle');
+
+            if (themeToggleButton) {
+                themeToggleButton.addEventListener('click', () => {
+                    const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    setStoredTheme(newTheme);
+                    setTheme(newTheme);
+                });
+            }
+
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                const storedTheme = getStoredTheme();
+                if (!storedTheme) {
+                    setTheme(getPreferredTheme());
+                }
+            });
+
+            // --- Script de Toggle da Sidebar (Responsivo) ---
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            const sidebarOverlay = document.querySelector('.sidebar-overlay');
+
+            const toggleSidebar = () => {
+                if (sidebar) sidebar.classList.toggle('active');
+                if (sidebarOverlay) sidebarOverlay.classList.toggle('active');
+            };
+
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', toggleSidebar);
+            }
+            
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', toggleSidebar);
+            }
+
+        })();
+    </script>
+
+</body>
+</html>
+

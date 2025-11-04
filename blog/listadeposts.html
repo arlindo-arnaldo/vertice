@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale-1.0">
+    <title>Todos os Posts - Blog Moderno</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <!-- Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <!-- Estilos Personalizados -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+        }
+
+        /* 1. Navbar Estilo Kinsta (Idêntico ao index.html) */
+       .navbar-top {
+            /* Animações: Adicionadas width, left, top, border-radius, box-shadow e border */
+            transition: transform 0.3s ease-in-out,
+                opacity 0.3s ease-in-out,
+                width 0.35s ease-in-out,
+                left 0.35s ease-in-out,
+                top 0.35s ease-in-out,
+                border-radius 0.35s ease-in-out,
+                background-color 0.3s ease-in-out,
+                box-shadow 0.3s ease-in-out,
+                border 0.35s ease-in-out;
+
+            transform: translateY(0);
+            opacity: 1;
+            z-index: 1030;
+            position: fixed;
+
+            /* Estado Inicial (Topo da Página) */
+            width: 100%;
+            left: 0;
+            top: 0;
+            border-radius: 0;
+            box-shadow: none;
+            border: 1px solid transparent;
+            /* Borda transparente para animar suavemente */
+        }
+
+        .navbar-hidden {
+            transform: translateY(-150%);
+            /* Ajustado para não ter translateX */
+            opacity: 0;
+        }
+
+        .navbar-scrolled {
+            /* Estado Flutuante (Após rolar) */
+            top: 1rem;
+            left: 10%;
+            /* (100% - 80%) / 2 */
+            width: 80%;
+            border-radius: 0.75rem;
+            box-shadow: var(--bs-box-shadow-lg) !important;
+            background-color: var(--bs-body-bg);
+            border: 1px solid var(--bs-border-color);
+
+            /* Removemos o transform: translateX(-50%) que causava o slide lateral */
+        }
+
+        .navbar-scrolled.navbar-hidden {
+            transform: translateY(-150%);
+            /* Simplificado */
+            opacity: 0;
+        }
+
+        .navbar-nav {
+            font-weight: 600;
+        }
+
+        .navbar-brand {
+            font-weight: 900;
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            transition: color 0.2s;
+        }
+        
+        .fw-900 { font-weight: 900; }
+        
+        /* 2. Estilos do Carrossel ("Slide") */
+        .featured-carousel {
+            padding-top: 60px; /* Espaço para o navbar inicial */
+            background-color: var(--bs-tertiary-bg);
+        }
+
+        .carousel-item {
+            height: 50vh; /* Altura do slide */
+            min-height: 400px;
+            max-height: 500px;
+        }
+
+        .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.6); /* Escurece a imagem para o texto destacar */
+        }
+        
+        /* Legenda moderna no canto inferior esquerdo */
+        .carousel-caption {
+            text-align: left;
+            bottom: 10%;
+            left: 5%;
+            right: auto;
+            width: 90%;
+            max-width: 600px;
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
+            padding: 1.5rem;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+        
+        .carousel-caption h2 {
+            font-weight: 900;
+        }
+        
+        .carousel-caption a {
+            color: #fff;
+            text-decoration: none;
+        }
+        .carousel-caption a:hover {
+            text-decoration: underline;
+        }
+
+        /* 3. Estilos dos Cards (Reutilizado do index.html) */
+        .card {
+            border: 0;
+            border-radius: 0.75rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            background-color: var(--bs-body); /* Garante fundo no card */
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--bs-box-shadow-lg) !important;
+        }
+
+        .card-img-top {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--bs-tertiary-bg);
+        }
+
+        /* Ícone do Toggle de Tema */
+        #theme-toggle .bi { display: none; }
+        html[data-bs-theme="light"] #theme-toggle .bi-sun-fill { display: inline-block; }
+        html[data-bs-theme="dark"] #theme-toggle .bi-moon-stars-fill { display: inline-block; }
+
+    </style>
+</head>
+<body class="bg-body-tertiary">
+
+    <!-- 1. NAVBAR (Idêntico ao da Home) -->
+    <nav class="navbar navbar-expand-lg bg-body navbar-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">BlogModerno</a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Design</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Desenvolvimento</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Sobre</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contato</a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-outline-secondary rounded-circle p-2 lh-1 me-2" id="theme-toggle" type="button" aria-label="Toggle theme">
+                        <i class="bi bi-sun-fill fs-5"></i>
+                        <i class="bi bi-moon-stars-fill fs-5"></i>
+                    </button>
+                    
+                    <a href="#" class="btn btn-primary rounded-pill px-3">Assinar</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 2. "SLIDE" - CARROSSEL DE DESTAQUES -->
+    <header class="featured-carousel">
+        <div id="featuredPostsCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#featuredPostsCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#featuredPostsCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#featuredPostsCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            </div>
+            
+            <div class="carousel-inner">
+                <!-- Slide 1 -->
+                <div class="carousel-item active">
+                    <img src="https://placehold.co/1600x500/5E50B9/FFFFFF?text=Post+Destaque+1" alt="Post em destaque 1" onerror="this.src='https://placehold.co/1600x500';this.onerror=null;">
+                    <div class="carousel-caption d-block">
+                        <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill mb-2">Destaque</span>
+                        <h2><a href="post.html">Como a IA está revolucionando o fluxo de trabalho de UI/UX</a></h2>
+                        <p class="d-none d-md-block">Descubra ferramentas e técnicas baseadas em IA que podem acelerar seu processo de design...</p>
+                    </div>
+                </div>
+                <!-- Slide 2 -->
+                <div class="carousel-item">
+                    <img src="https://placehold.co/1600x500/C147E9/FFFFFF?text=Post+Destaque+2" alt="Post em destaque 2" onerror="this.src='https://placehold.co/1600x500';this.onerror=null;">
+                    <div class="carousel-caption d-block">
+                        <span class="badge bg-info-subtle text-info-emphasis rounded-pill mb-2">Performance</span>
+                        <h2><a href="post.html">O Guia Definitivo para Core Web Vitals</a></h2>
+                        <p class="d-none d-md-block">Melhore seu LCP, FID e CLS e veja seu ranking no Google decolar.</p>
+                    </div>
+                </div>
+                <!-- Slide 3 -->
+                <div class="carousel-item">
+                    <img src="https://placehold.co/1600x500/F2BE22/FFFFFF?text=Post+Destaque+3" alt="Post em destaque 3" onerror="this.src='https://placehold.co/1600x500';this.onerror=null;">
+                    <div class="carousel-caption d-block">
+                        <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill mb-2">JavaScript</span>
+                        <h2><a href="post.html">5 Padrões de Design Essenciais em JavaScript</a></h2>
+                        <p class="d-none d-md-block">Escreva código mais limpo, manutenível e escalável com estes padrões.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="carousel-control-prev" type="button" data-bs-target="#featuredPostsCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Anterior</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#featuredPostsCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Próximo</span>
+            </button>
+        </div>
+    </header>
+
+    
+    <!-- 3. CONTEÚDO PRINCIPAL E SIDEBAR -->
+    <main class="container my-5">
+        
+        <h2 class="fw-bold mb-4">Todos os Artigos</h2>
+        
+        <!-- Grade de Posts -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            
+            <!-- Card 1 -->
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://placehold.co/600x400/22A699/FFFFFF?text=CSS" 
+                         class="card-img-top" 
+                         alt="Artigo sobre CSS"
+                         onerror="this.src='https://placehold.co/600x400';this.onerror=null;">
+                    <div class="card-body d-flex flex-column">
+                        <span class="badge bg-success-subtle text-success-emphasis rounded-pill mb-2 align-self-start">CSS</span>
+                        <h5 class="card-title fw-bold"><a href="post.html" class="text-decoration-none text-body">Dominando as Novas Viewport Units do CSS</a></h5>
+                        <p class="card-text text-muted small flex-grow-1">Adeus 'vh' e 'vw' problemáticos. Olá 'svh' e 'lvh'!</p>
+                        <div class="d-flex align-items-center small text-muted mt-3">
+                            <img src="https://placehold.co/30x30/ddd/333?text=BR" alt="Avatar" class="rounded-circle me-2" onerror="this.src='https://placehold.co/30x30';this.onerror=null;">
+                            <span>Bruno Ramos • 22 de Outubro, 2025</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://placehold.co/600x400/F2BE22/FFFFFF?text=JavaScript" 
+                         class="card-img-top" 
+                         alt="Artigo sobre JavaScript"
+                         onerror="this.src='https://placehold.co/600x400';this.onerror=null;">
+                    <div class="card-body d-flex flex-column">
+                        <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill mb-2 align-self-start">JavaScript</span>
+                        <h5 class="card-title fw-bold"><a href="post.html" class="text-decoration-none text-body">5 Padrões de Design Essenciais em JavaScript</a></h5>
+                        <p class="card-text text-muted small flex-grow-1">Escreva código mais limpo, manutenível e escalável.</p>
+                        <div class="d-flex align-items-center small text-muted mt-3">
+                            <img src="https://placehold.co/30x30/ccc/333?text=AS" alt="Avatar" class="rounded-circle me-2" onerror="this.src='https://placehold.co/30x30';this.onerror=null;">
+                            <span>Ana Silva • 20 de Outubro, 2025</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://placehold.co/600x400/C147E9/FFFFFF?text=Performance" 
+                         class="card-img-top" 
+                         alt="Artigo sobre Performance"
+                         onerror="this.src='https://placehold.co/600x400';this.onerror=null;">
+                    <div class="card-body d-flex flex-column">
+                        <span class="badge bg-info-subtle text-info-emphasis rounded-pill mb-2 align-self-start">Performance</span>
+                        <h5 class="card-title fw-bold"><a href="post.html" class="text-decoration-none text-body">O Guia Definitivo para Core Web Vitals</a></h5>
+                        <p class="card-text text-muted small flex-grow-1">Melhore seu LCP, FID e CLS e veja seu ranking decolar.</p>
+                        <div class="d-flex align-items-center small text-muted mt-3">
+                            <img src="https://placehold.co/30x30/bbb/333?text=CR" alt="Avatar" class="rounded-circle me-2" onerror="this.src='https://placehold.co/30x30';this.onerror=null;">
+                            <span>Carla Ribeiro • 18 de Outubro, 2025</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://placehold.co/600x400/E86A33/FFFFFF?text=DevOps" 
+                         class="card-img-top" 
+                         alt="Artigo sobre DevOps"
+                         onerror="this.src='https://placehold.co/600x400';this.onerror=null;">
+                    <div class="card-body d-flex flex-column">
+                        <span class="badge bg-danger-subtle text-danger-emphasis rounded-pill mb-2 align-self-start">DevOps</span>
+                        <h5 class="card-title fw-bold"><a href="post.html" class="text-decoration-none text-body">Introdução ao Docker para Desenvolvedores Frontend</a></h5>
+                        <p class="card-text text-muted small flex-grow-1">Pare de dizer "na minha máquina funciona".</p>
+                        <div class="d-flex align-items-center small text-muted mt-3">
+                            <img src="https://placehold.co/30x30/ddd/333?text=BR" alt="Avatar" class="rounded-circle me-2" onerror="this.src='https://placehold.co/30x30';this.onerror=null;">
+                            <span>Bruno Ramos • 15 de Outubro, 2025</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://placehold.co/600x400/495E57/FFFFFF?text=Carreira" 
+                         class="card-img-top" 
+                         alt="Artigo sobre Carreira"
+                         onerror="this.src='https://placehold.co/600x400';this.onerror=null;">
+                    <div class="card-body d-flex flex-column">
+                        <span class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill mb-2 align-self-start">Carreira</span>
+                        <h5 class="card-title fw-bold"><a href="post.html" class="text-decoration-none text-body">Trabalho Remoto: 5 Mitos que Precisamos Quebrar</a></h5>
+                        <p class="card-text text-muted small flex-grow-1">A produtividade realmente cai? Como fica a cultura?</p>
+                        <div class="d-flex align-items-center small text-muted mt-3">
+                            <img src="https://placehold.co/30x30/bbb/333?text=CR" alt="Avatar" class="rounded-circle me-2" onerror="this.src='https://placehold.co/30x30';this.onerror=null;">
+                            <span>Carla Ribeiro • 12 de Outubro, 2025</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 6 -->
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://placehold.co/600x400/003C43/FFFFFF?text=Segurança" 
+                         class="card-img-top" 
+                         alt="Artigo sobre Segurança"
+                         onerror="this.src='https://placehold.co/600x400';this.onerror=null;">
+                    <div class="card-body d-flex flex-column">
+                        <span class="badge bg-dark-subtle text-dark-emphasis rounded-pill mb-2 align-self-start">Segurança</span>
+                        <h5 class="card-title fw-bold"><a href="post.html" class="text-decoration-none text-body">O Básico de Segurança Web que todo Dev precisa saber</a></h5>
+                        <p class="card-text text-muted small flex-grow-1">XSS, CSRF, e SQL Injection explicados de forma simples.</p>
+                        <div class="d-flex align-items-center small text-muted mt-3">
+                            <img src="https://placehold.co/30x30/ccc/333?text=AS" alt="Avatar" class="rounded-circle me-2" onerror="this.src='https://placehold.co/30x30';this.onerror=null;">
+                            <span>Ana Silva • 10 de Outubro, 2025</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 7 -->
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://placehold.co/600x400/5E50B9/FFFFFF?text=IA" 
+                         class="card-img-top" 
+                         alt="Artigo sobre IA"
+                         onerror="this.src='https://placehold.co/600x400';this.onerror=null;">
+                    <div class="card-body d-flex flex-column">
+                        <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill mb-2 align-self-start">IA</span>
+                        <h5 class="card-title fw-bold"><a href="post.html" class="text-decoration-none text-body">Como a IA está revolucionando o fluxo de trabalho de UI/UX</a></h5>
+                        <p class="card-text text-muted small flex-grow-1">Descubra ferramentas e técnicas baseadas em IA.</p>
+                        <div class="d-flex align-items-center small text-muted mt-3">
+                            <img src="https://placehold.co/30x30/ccc/333?text=AS" alt="Avatar" class="rounded-circle me-2" onerror="this.src='https://placehold.co/30x30';this.onerror=null;">
+                            <span>Ana Silva • 24 de Outubro, 2025</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 8 -->
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://placehold.co/600x400/22A699/FFFFFF?text=CSS" 
+                         class="card-img-top" 
+                         alt="Artigo sobre CSS"
+                         onerror="this.src='https://placehold.co/600x400';this.onerror=null;">
+                    <div class="card-body d-flex flex-column">
+                        <span class="badge bg-success-subtle text-success-emphasis rounded-pill mb-2 align-self-start">CSS</span>
+                        <h5 class="card-title fw-bold"><a href="post.html" class="text-decoration-none text-body">Grid vs. Flexbox: Quando usar cada um?</a></h5>
+                        <p class="card-text text-muted small flex-grow-1">Um debate comum que confunde muitos desenvolvedores.</p>
+                        <div class="d-flex align-items-center small text-muted mt-3">
+                            <img src="https://placehold.co/30x30/ddd/333?text=BR" alt="Avatar" class="rounded-circle me-2" onerror="this.src='https://placehold.co/30x30';this.onerror=null;">
+                            <span>Bruno Ramos • 8 de Outubro, 2025</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 9 -->
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://placehold.co/600x400/F2BE22/FFFFFF?text=JavaScript" 
+                         class="card-img-top" 
+                         alt="Artigo sobre JavaScript"
+                         onerror="this.src='https://placehold.co/600x400';this.onerror=null;">
+                    <div class="card-body d-flex flex-column">
+                        <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill mb-2 align-self-start">JavaScript</span>
+                        <h5 class="card-title fw-bold"><a href="post.html" class="text-decoration-none text-body">Entendendo Promises e Async/Await de uma vez por todas</a></h5>
+                        <p class="card-text text-muted small flex-grow-1">Código assíncrono não precisa ser um pesadelo.</p>
+                        <div class="d-flex align-items-center small text-muted mt-3">
+                            <img src="https://placehold.co/30x30/ccc/333?text=AS" alt="Avatar" class="rounded-circle me-2" onerror="this.src='https://placehold.co/30x30';this.onerror=null;">
+                            <span>Ana Silva • 5 de Outubro, 2025</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> 
+
+        <!-- 4. PAGINAÇÃO -->
+        <nav aria-label="Paginação de artigos" class="mt-5 pt-4 border-top">
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                </li>
+                <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Próxima</a>
+                </li>
+            </ul>
+        </nav>
+
+    </main>
+
+    <!-- 5. FOOTER (Idêntico ao da Home) -->
+    <footer class="footer py-5 mt-5 border-top">
+        <div class="container">
+            <div class="row">
+                <!-- Logo e Copyright -->
+                <div class="col-lg-4 mb-3 mb-lg-0">
+                    <a class="navbar-brand fs-4" href="index.html">BlogModerno</a>
+                    <p class="text-muted small mt-2">© 2025 BlogModerno. <br> Todos os direitos reservados.</p>
+                </div>
+                <!-- Links 1 -->
+                <div class="col-6 col-lg-2 offset-lg-2">
+                    <h5 class="fw-bold mb-3">Mapa</h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2"><a href="index.html" class="nav-link p-0 text-muted">Home</a></li>
+                        <li class="nav-item mb-2"><a href="all-posts.html" class="nav-link p-0 text-muted">Artigos</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Sobre</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Contato</a></li>
+                    </ul>
+                </div>
+                <!-- Links 2 -->
+                <div class="col-6 col-lg-2">
+                    <h5 class="fw-bold mb-3">Legal</h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Privacidade</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Termos de Uso</a></li>
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Cookies</a></li>
+                    </ul>
+                </div>
+                <!-- Social -->
+                <div class="col-lg-2">
+                    <h5 class="fw-bold mb-3">Siga-nos</h5>
+                    <div class="d-flex fs-4">
+                        <a href="#" class="text-muted me-3"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" class="text-muted me-3"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="text-muted"><i class="bi bi-github"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <!-- Scripts (Dark Mode + Header Dinâmico) -->
+    <script>
+        (() => {
+            'use strict';
+
+            // --- Script de Toggle de Tema ---
+            const getStoredTheme = () => localStorage.getItem('theme');
+            const setStoredTheme = theme => localStorage.setItem('theme', theme);
+
+            const getPreferredTheme = () => {
+                const storedTheme = getStoredTheme();
+                if (storedTheme) {
+                    return storedTheme;
+                }
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            };
+
+            const setTheme = theme => {
+                document.documentElement.setAttribute('data-bs-theme', theme);
+            };
+
+            setTheme(getPreferredTheme());
+
+            const themeToggleButton = document.getElementById('theme-toggle');
+
+            if (themeToggleButton) {
+                themeToggleButton.addEventListener('click', () => {
+                    const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    setStoredTheme(newTheme);
+                    setTheme(newTheme);
+                });
+            }
+
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                const storedTheme = getStoredTheme();
+                if (!storedTheme) {
+                    setTheme(getPreferredTheme());
+                }
+            });
+
+            // --- Script para o Header Dinâmico (Kinsta-like) ---
+            const navbar = document.querySelector('.navbar-top');
+            if (navbar) { 
+                let lastScrollY = window.scrollY;
+                const scrollThreshold = 100; 
+
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > lastScrollY && window.scrollY > scrollThreshold) {
+                        navbar.classList.add('navbar-hidden');
+                    } else if (window.scrollY < lastScrollY && window.scrollY > scrollThreshold) {
+                        navbar.classList.remove('navbar-hidden');
+                    } else if (window.scrollY <= scrollThreshold) {
+                        navbar.classList.remove('navbar-hidden');
+                    }
+                    lastScrollY = window.scrollY;
+
+                    if (window.scrollY > 0) {
+                        navbar.classList.add('navbar-scrolled');
+                    } else {
+                        navbar.classList.remove('navbar-scrolled');
+                    }
+                });
+                
+                window.dispatchEvent(new Event('scroll'));
+            }
+
+        })();
+    </script>
+
+</body>
+</html>

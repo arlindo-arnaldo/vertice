@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados da Pesquisa - Blog Moderno</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <!-- Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+            position: relative;
+        }
+
+        /* 1. Navbar Estilo Kinsta */
+        .navbar-top {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out, width 0.3s ease-in-out, border-radius 0.3s ease-in-out;
+            transform: translateY(0);
+            opacity: 1;
+            z-index: 1030;
+            position: fixed;
+            width: 100%;
+            left: 0;
+            top: 0;
+            border-radius: 0; /* Começa sem bordas */
+        }
+
+        .navbar-hidden {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+
+        .navbar-scrolled {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%; /* 80% da largura */
+            border-radius: 0.75rem; /* Bordas arredondadas */
+            box-shadow: var(--bs-box-shadow-lg) !important;
+            background-color: var(--bs-body-bg);
+            border: 1px solid var(--bs-border-color);
+        }
+
+        .navbar-scrolled.navbar-hidden {
+            transform: translateY(-150%) translateX(-50%);
+            opacity: 0;
+        }
+
+        .navbar-nav {
+            font-weight: 600;
+        }
+
+        .navbar-brand {
+            font-weight: 900;
+            font-size: 1.5rem;
+        }
+        
+        .nav-link {
+            transition: color 0.2s;
+        }
+
+        /* 2. Ícone do Toggle de Tema */
+        #theme-toggle .bi {
+            display: none;
+        }
+        html[data-bs-theme="light"] #theme-toggle .bi-sun-fill {
+            display: inline-block;
+        }
+        html[data-bs-theme="dark"] #theme-toggle .bi-moon-stars-fill {
+            display: inline-block;
+        }
+        
+        /* 3. Estilos da Página de Pesquisa */
+        .search-header {
+            padding-top: 8rem; /* Compensa o navbar */
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--bs-border-color);
+        }
+        
+        .search-result-item {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--bs-border-color);
+        }
+        .search-result-item:last-child {
+            border-bottom: 0;
+        }
+
+        .search-result-item h4 {
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        .search-result-item h4 a {
+            text-decoration: none;
+            color: inherit;
+        }
+        .search-result-item h4 a:hover {
+            color: var(--bs-primary);
+        }
+
+        .search-result-item .snippet {
+            font-size: 1rem;
+            color: var(--bs-secondary-color);
+        }
+
+        .search-result-item .meta {
+            font-size: 0.85rem;
+            color: var(--bs-tertiary-color);
+            margin-top: 0.5rem;
+        }
+        
+        /* Sidebar Widget */
+        .sidebar-widget {
+            background-color: var(--bs-body-bg);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            box-shadow: var(--bs-box-shadow-sm);
+        }
+        .sidebar-widget h5 {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--bs-border-color);
+        }
+        .sidebar-widget .list-group-item {
+            background-color: transparent;
+            border: 0;
+            border-bottom: 1px solid var(--bs-border-color);
+            padding: 0.75rem 0.25rem;
+        }
+        .sidebar-widget .list-group-item:last-child {
+            border-bottom: 0;
+        }
+        .sidebar-widget .list-group-item a {
+            text-decoration: none;
+            font-weight: 600;
+            color: var(--bs-body-color);
+        }
+        .sidebar-widget .list-group-item a:hover {
+            color: var(--bs-primary);
+        }
+
+
+        /* Footer */
+        .footer {
+            background-color: var(--bs-tertiary-bg);
+        }
+        
+        /* 4. Seção Newsletter */
+        .newsletter-box {
+            border: 1px solid var(--bs-border-color);
+        }
+        
+        #newsletter-form .form-control-lg {
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+        }
+
+    </style>
+</head>
+<body class="bg-body-tertiary">
+
+    <!-- 1. Header Dinâmico -->
+    <nav class="navbar navbar-expand-lg bg-body navbar-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">BlogModerno</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="all-posts.html">Artigos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Sobre</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <!-- Formulário de Pesquisa no Header -->
+                    <form class="d-flex me-2" role="search">
+                        <input class="form-control form-control-sm rounded-pill" type="search" placeholder="Pesquisar..." aria-label="Pesquisar">
+                    </form>
+                    <button class="btn btn-outline-secondary rounded-circle p-2 lh-1 me-2" id="theme-toggle" type="button" aria-label="Toggle theme">
+                        <i class="bi bi-sun-fill fs-5"></i>
+                        <i class="bi bi-moon-stars-fill fs-5"></i>
+                    </button>
+                    <a href="login.html" class="btn btn-primary rounded-pill px-3">Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 2. Conteúdo Principal - Resultados da Pesquisa -->
+    <div class="container">
+        
+        <!-- Cabeçalho -->
+        <header class="search-header">
+            <h1 class="display-5 fw-bold">Resultados para: "CSS"</h1>
+            <p class="lead text-muted">Encontrámos 2 artigos correspondentes.</p>
+        </header>
+
+        <div class="row mt-4">
+            
+            <!-- Coluna de Resultados -->
+            <div class="col-lg-8">
+                
+                <!-- Item de Resultado 1 -->
+                <div class="search-result-item">
+                    <h4><a href="post.html">Dominando as Novas Viewport Units: svh, lvh e dvh</a></h4>
+                    <p class="snippet">
+                        ... Por anos, desenvolvedores web tiveram uma relação de amor e ódio com 100vh. A promessa era simples: 100% da altura da viewport. Mas em dispositivos móveis... Felizmente, o W3C nos deu novas unidades para resolver exatamente isso...
+                    </p>
+                    <div class="meta">
+                        Em <span class="badge bg-success-subtle text-success-emphasis rounded-pill">CSS</span> • 22 de Outubro, 2025
+                    </div>
+                </div>
+
+                <!-- Item de Resultado 2 -->
+                <div class="search-result-item">
+                    <h4><a href="#">O Guia Definitivo para Core Web Vitals</a></h4>
+                    <p class="snippet">
+                        ... Melhore seu LCP, FID e CLS e veja seu ranking no Google decolar. Este guia cobre como o <strong>CSS</strong> e o JavaScript afetam estas métricas vitais de performance...
+                    </p>
+                    <div class="meta">
+                        Em <span class="badge bg-info-subtle text-info-emphasis rounded-pill">Performance</span> • 18 de Outubro, 2025
+                    </div>
+                </div>
+                
+                <!-- Paginação (se houver muitos resultados) -->
+                <nav aria-label="Paginação de resultados" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                        </li>
+                        <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Próxima</a>
+                        </li>
+                    </ul>
+                </nav>
+
+            </div>
+
+            <!-- Coluna da Sidebar -->
+            <div class="col-lg-4">
+                <div class="sidebar-widget">
+                    <h5>Pesquisar Novamente</h5>
+                    <form class="d-flex" role="search">
+                        <input class="form-control me-2" type="search" placeholder="Pesquisar artigos..." aria-label="Pesquisar">
+                        <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i></button>
+                    </form>
+                </div>
+
+                <div class="sidebar-widget">
+                    <h5>Categorias Populares</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><a href="#">CSS</a></li>
+                        <li class="list-group-item"><a href="#">JavaScript</a></li>
+                        <li class="list-group-item"><a href="#">Performance</a></li>
+                        <li class="list-group-item"><a href="#">DevOps</a></li>
+                        <li class="list-group-item"><a href="#">Carreira</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+    </div> <!-- Fim do .container principal -->
+
+    <!-- NOVA SEÇÃO: Newsletter -->
+    <section class="newsletter-section bg-body-secondary py-5 mt-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <div class="newsletter-box bg-body p-5 rounded-4 shadow-sm">
+                        <i class="bi bi-envelope-paper-heart fs-1 text-primary"></i>
+                        <h2 class="fw-bold mt-3 mb-3">Junte-se à nossa Newsletter</h2>
+                        <p class="text-muted mb-4">Receba os melhores artigos, tutoriais e notícias de design e dev diretamente no seu email. Sem spam, prometemos.</p>
+                        <form class="d-flex justify-content-center" id="newsletter-form">
+                            <label for="newsletter-email" class="visually-hidden">Seu email</label>
+                            <input type="email" id="newsletter-email" class="form-control form-control-lg w-75 me-2 rounded-pill" placeholder="seu.email@exemplo.com" required>
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-4">Inscrever</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- FIM DA SEÇÃO: Newsletter -->
+
+
+    <!-- 3. Footer -->
+    <footer class="footer py-5 mt-5 border-top">
+        <div class="container text-center text-muted small">
+            <p>© 2025 BlogModerno. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <!-- JS Personalizado -->
+    <script>
+        (() => {
+            'use strict';
+            
+            // Inicializa todos os Tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // --- 1. Script do Tema (Dark Mode) ---
+            const getStoredTheme = () => localStorage.getItem('theme');
+            const setStoredTheme = theme => localStorage.setItem('theme', theme);
+            const getPreferredTheme = () => {
+                const storedTheme = getStoredTheme();
+                if (storedTheme) {
+                    return storedTheme;
+                }
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            };
+            const setTheme = theme => {
+                document.documentElement.setAttribute('data-bs-theme', theme);
+            };
+            setTheme(getPreferredTheme());
+            const themeToggleButton = document.getElementById('theme-toggle');
+            if (themeToggleButton) {
+                themeToggleButton.addEventListener('click', () => {
+                    const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    setStoredTheme(newTheme);
+                    setTheme(newTheme);
+                });
+            }
+
+            // --- 2. Script do Header Dinâmico (Kinsta-like) ---
+            const navbar = document.querySelector('.navbar-top');
+            let lastScrollY = window.scrollY;
+            const scrollThreshold = 100;
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > lastScrollY && window.scrollY > scrollThreshold) {
+                    navbar.classList.add('navbar-hidden');
+                } else if (window.scrollY < lastScrollY && window.scrollY > scrollThreshold) {
+                    navbar.classList.remove('navbar-hidden');
+                } else if (window.scrollY <= scrollThreshold) {
+                    navbar.classList.remove('navbar-hidden');
+                }
+                
+                if (window.scrollY > 0) {
+                    navbar.classList.add('navbar-scrolled');
+                } else {
+                    navbar.classList.remove('navbar-scrolled');
+                    navbar.classList.remove('navbar-hidden');
+                }
+                lastScrollY = window.scrollY;
+            }, { passive: true });
+            window.dispatchEvent(new Event('scroll'));
+
+        })();
+    </script>
+
+</body>
+</html>
+

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planos e Preços - Blog Moderno</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <!-- Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+            position: relative;
+        }
+
+        /* 1. Navbar Estilo Kinsta */
+        .navbar-top {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out, width 0.3s ease-in-out, border-radius 0.3s ease-in-out;
+            transform: translateY(0);
+            opacity: 1;
+            z-index: 1030;
+            position: fixed;
+            width: 100%;
+            left: 0;
+            top: 0;
+            border-radius: 0; /* Começa sem bordas */
+        }
+
+        .navbar-hidden {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+
+        .navbar-scrolled {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%; /* 80% da largura */
+            border-radius: 0.75rem; /* Bordas arredondadas */
+            box-shadow: var(--bs-box-shadow-lg) !important;
+            background-color: var(--bs-body-bg);
+            border: 1px solid var(--bs-border-color);
+        }
+
+        .navbar-scrolled.navbar-hidden {
+            transform: translateY(-150%) translateX(-50%);
+            opacity: 0;
+        }
+
+        .navbar-nav {
+            font-weight: 600;
+        }
+
+        .navbar-brand {
+            font-weight: 900;
+            font-size: 1.5rem;
+        }
+        
+        .nav-link {
+            transition: color 0.2s;
+        }
+
+        /* 2. Ícone do Toggle de Tema */
+        #theme-toggle .bi {
+            display: none;
+        }
+        html[data-bs-theme="light"] #theme-toggle .bi-sun-fill {
+            display: inline-block;
+        }
+        html[data-bs-theme="dark"] #theme-toggle .bi-moon-stars-fill {
+            display: inline-block;
+        }
+        
+        /* 3. Estilos da Página de Preços */
+        .pricing-header {
+            padding-top: 8rem; /* Compensa o navbar */
+            padding-bottom: 4rem;
+        }
+        
+        .pricing-card {
+            border-radius: 0.75rem;
+            border: 1px solid var(--bs-border-color);
+            transition: all 0.3s ease;
+            height: 100%; /* Garante altura igual */
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .pricing-card-highlight {
+            border-color: var(--bs-primary);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05), 0 0 1rem var(--bs-primary-border-subtle);
+            transform: scale(1.03); /* Destaca o plano Pro */
+        }
+
+        .pricing-card .card-body {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1; /* Faz o body preencher o espaço */
+        }
+
+        .pricing-card .card-title {
+            font-weight: 700;
+        }
+
+        .pricing-card .price {
+            font-size: 2.5rem;
+            font-weight: 900;
+        }
+
+        .pricing-card .list-group-item {
+            border: 0;
+            padding-left: 0;
+            background-color: transparent;
+        }
+
+        .pricing-card .list-group-item .bi {
+            color: var(--bs-success);
+            margin-right: 0.5rem;
+        }
+        
+        .pricing-card .btn {
+            border-radius: 2rem;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            margin-top: auto; /* Empurra o botão para o fim do card */
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--bs-tertiary-bg);
+        }
+
+    </style>
+</head>
+<body class="bg-body-tertiary">
+
+    <!-- 1. Header Dinâmico -->
+    <nav class="navbar navbar-expand-lg bg-body navbar-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">BlogModerno</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="all-posts.html">Artigos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Sobre</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-outline-secondary rounded-circle p-2 lh-1 me-2" id="theme-toggle" type="button" aria-label="Toggle theme">
+                        <i class="bi bi-sun-fill fs-5"></i>
+                        <i class="bi bi-moon-stars-fill fs-5"></i>
+                    </button>
+                    <a href="login.html" class="btn btn-primary rounded-pill px-3">Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 2. Conteúdo Principal - Preços -->
+    <div class="container">
+        
+        <!-- Cabeçalho -->
+        <header class="pricing-header text-center">
+            <h1 class="display-4 fw-bold">Planos feitos para você</h1>
+            <p class="lead text-muted col-lg-6 mx-auto">Escolha o plano que desbloqueia o seu potencial. Acesse conteúdo exclusivo e ferramentas de IA.</p>
+        </header>
+
+        <!-- Cards de Preços -->
+        <div class="row g-4 mb-5">
+
+            <!-- Plano Básico (Grátis) -->
+            <div class="col-lg-4">
+                <div class="card pricing-card">
+                    <div class="card-body p-4 p-lg-5">
+                        <h5 class="card-title text-muted">Básico</h5>
+                        <div class="price mb-2">Grátis</div>
+                        <p class="card-text text-muted mb-4">Para começar a explorar o nosso conteúdo público.</p>
+                        
+                        <ul class="list-group list-group-flush mb-4">
+                            <li class="list-group-item"><i class="bi bi-check-circle-fill"></i> Acesso a artigos públicos</li>
+                            <li class="list-group-item"><i class="bi bi-check-circle-fill"></i> Comentar nos posts</li>
+                            <li class="list-group-item"><i class="bi bi-check-circle-fill"></i> Newsletter semanal</li>
+                        </ul>
+                        
+                        <a href="login.html" class="btn btn-outline-secondary">Comece Agora</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plano Pro (Destaque) -->
+            <div class="col-lg-4">
+                <div class="card pricing-card pricing-card-highlight">
+                    <div class="card-header bg-primary text-white border-0 text-center fw-bold rounded-top-3">
+                        MAIS POPULAR
+                    </div>
+                    <div class="card-body p-4 p-lg-5">
+                        <h5 class="card-title text-primary">Pro</h5>
+                        <div class="price mb-2">R$ 19<span class="fs-5 text-muted">/mês</span></div>
+                        <p class="card-text text-muted mb-4">Para quem quer acesso total e ferramentas avançadas.</p>
+                        
+                        <ul class="list-group list-group-flush mb-4">
+                            <li class="list-group-item"><i class="bi bi-check-circle-fill"></i> <strong>Tudo do Básico, e mais:</strong></li>
+                            <li class="list-group-item"><i class="bi bi-check-circle-fill"></i> Acesso a artigos <strong>exclusivos</strong></li>
+                            <li class="list-group-item"><i class="bi bi-check-circle-fill"></i> Resumo de posts com <strong>IA</strong></li>
+                            <li class="list-group-item"><i class="bi bi-check-circle-fill"></i> Chatbot "Pergunte ao Artigo"</li>
+                            <li class="list-group-item"><i class="bi bi-check-circle-fill"></i> "Ouvir este Artigo" (Áudio IA)</li>
+                            <li class="list-group-item"><i class="bi bi-check-circle-fill"></i> Salvar artigos (Lista de Leitura)</li>
+                        </ul>
+                        
+                        <a href="#" class="btn btn-primary shadow-lg">Assinar o Plano Pro</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plano Empresarial -->
+            <div class="col-lg-4">
+                <div class="card pricing-card">
+                    <div class="card-body p-4 p-lg-5">
+                        <h5 class="card-title text-muted">Empresarial</h5>
+                        <div class="price mb-2">Custom.</div>
+                        <p class="card-text text-muted mb-4">Para equipas que precisam de mais controlo e suporte.</p>
+                        
+                        <ul class="list-group list-group-flush mb-4">
+                            <li class="list-group-item"><i class="bi bi-check-circle-fill"></i> <strong>Tudo do Pro, e mais:</strong></li>
+                            <li class="list-group-item"><i class="bi bi-check-circle-fill"></i> Assentos para equipa (5+)</li>
+                            <li class="list-group-item"><i class="bi bi-check-circle-fill"></i> Analytics de equipa</li>
+                            <li class="list-group-item"><i class="bi bi-check-circle-fill"></i> Suporte prioritário</li>
+                        </ul>
+                        
+                        <a href="#" class="btn btn-outline-secondary">Entre em Contato</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- 3. Footer -->
+    <footer class="footer py-5 mt-5 border-top">
+        <div class="container text-center text-muted small">
+            <p>© 2025 BlogModerno. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <!-- JS Personalizado -->
+    <script>
+        (() => {
+            'use strict';
+            
+            // Inicializa todos os Tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // --- 1. Script do Tema (Dark Mode) ---
+            const getStoredTheme = () => localStorage.getItem('theme');
+            const setStoredTheme = theme => localStorage.setItem('theme', theme);
+            const getPreferredTheme = () => {
+                const storedTheme = getStoredTheme();
+                if (storedTheme) {
+                    return storedTheme;
+                }
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            };
+            const setTheme = theme => {
+                document.documentElement.setAttribute('data-bs-theme', theme);
+            };
+            setTheme(getPreferredTheme());
+            const themeToggleButton = document.getElementById('theme-toggle');
+            if (themeToggleButton) {
+                themeToggleButton.addEventListener('click', () => {
+                    const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    setStoredTheme(newTheme);
+                    setTheme(newTheme);
+                });
+            }
+
+            // --- 2. Script do Header Dinâmico (Kinsta-like) ---
+            const navbar = document.querySelector('.navbar-top');
+            let lastScrollY = window.scrollY;
+            const scrollThreshold = 100;
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > lastScrollY && window.scrollY > scrollThreshold) {
+                    navbar.classList.add('navbar-hidden');
+                } else if (window.scrollY < lastScrollY && window.scrollY > scrollThreshold) {
+                    navbar.classList.remove('navbar-hidden');
+                } else if (window.scrollY <= scrollThreshold) {
+                    navbar.classList.remove('navbar-hidden');
+                }
+                
+                if (window.scrollY > 0) {
+                    navbar.classList.add('navbar-scrolled');
+                } else {
+                    navbar.classList.remove('navbar-scrolled');
+                    navbar.classList.remove('navbar-hidden');
+                }
+                lastScrollY = window.scrollY;
+            }, { passive: true });
+            window.dispatchEvent(new Event('scroll'));
+
+        })();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Post - Blog Moderno</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <!-- Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+            position: relative; /* Necessário para o ScrollSpy */
+        }
+
+        /* 1. Navbar Estilo Kinsta */
+        .navbar-top {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out, width 0.3s ease-in-out, border-radius 0.3s ease-in-out;
+            transform: translateY(0);
+            opacity: 1;
+            z-index: 1030;
+            position: fixed;
+            width: 100%;
+            left: 0;
+            top: 0;
+            border-radius: 0; /* Começa sem bordas */
+        }
+
+        .navbar-hidden {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+
+        .navbar-scrolled {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%; /* 80% da largura */
+            border-radius: 0.75rem; /* Bordas arredondadas */
+            box-shadow: var(--bs-box-shadow-lg) !important;
+            background-color: var(--bs-body-bg);
+            border: 1px solid var(--bs-border-color);
+        }
+
+        .navbar-scrolled.navbar-hidden {
+            transform: translateY(-150%) translateX(-50%);
+            opacity: 0;
+        }
+
+        .navbar-nav {
+            font-weight: 600;
+        }
+
+        .navbar-brand {
+            font-weight: 900;
+            font-size: 1.5rem;
+        }
+        
+        .nav-link {
+            transition: color 0.2s;
+        }
+
+        /* 2. Ícone do Toggle de Tema */
+        #theme-toggle .bi {
+            display: none;
+        }
+        html[data-bs-theme="light"] #theme-toggle .bi-sun-fill {
+            display: inline-block;
+        }
+        html[data-bs-theme="dark"] #theme-toggle .bi-moon-stars-fill {
+            display: inline-block;
+        }
+        
+        /* 3. Layout do Post */
+        .post-header {
+            padding: 4rem 0 2rem 0;
+        }
+        .post-content {
+            font-size: 1.125rem;
+            line-height: 1.8;
+        }
+        .post-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+        }
+        .post-content pre {
+            background-color: var(--bs-tertiary-bg);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            overflow-x: auto;
+        }
+        .post-content h2, .post-content h3 {
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            position: relative; /* Para link de âncora */
+        }
+
+        /* 4. Widgets da Sidebar */
+        .sidebar-widget {
+            background-color: var(--bs-body-bg);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--bs-box-shadow-sm);
+        }
+        .sidebar-widget h5 {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--bs-border-color);
+        }
+
+        /* Tabela de Conteúdo (Scroll-Spy) */
+        .toc-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .toc-list .nav-link {
+            text-decoration: none;
+            color: var(--bs-secondary-color);
+            font-size: 0.9rem;
+            display: block;
+            padding: 0.25rem 0;
+            transition: all 0.2s;
+            border-left: 2px solid transparent;
+            padding-left: 0.5rem;
+        }
+        .toc-list .nav-link:hover,
+        .toc-list .nav-link.active {
+            color: var(--bs-primary);
+            border-left-color: var(--bs-primary);
+            background-color: var(--bs-primary-subtle);
+            transform: translateX(5px);
+        }
+        
+        /* Posts Relacionados */
+        .related-post-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            text-decoration: none;
+            color: inherit;
+        }
+        .related-post-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 0.375rem;
+            margin-right: 1rem;
+        }
+        .related-post-item:hover h6 {
+            color: var(--bs-primary);
+        }
+        .related-post-item h6 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+        .related-post-item span {
+            font-size: 0.8rem;
+            color: var(--bs-secondary-color);
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: var(--bs-tertiary-bg);
+        }
+
+        /* 5. Barra de Progresso de Leitura */
+        .progress-bar-container {
+            position: fixed;
+            top: 0; /* Ajuste se o navbar sumir/aparecer */
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: transparent;
+            z-index: 1031; /* Acima do navbar */
+            background-image: linear-gradient(to right, var(--bs-primary), var(--bs-primary));
+            background-repeat: no-repeat;
+            background-size: 0 100%;
+            transition: width 0.05s ease-out; /* Suavização */
+        }
+
+        /* 6. Estilos de "Palmas" (Claps) */
+        .clap-wrapper {
+            padding: 2rem 0;
+            border-top: 1px solid var(--bs-border-color);
+            border-bottom: 1px solid var(--bs-border-color);
+        }
+        .clap-button {
+            width: 60px;
+            height: 60px;
+            font-size: 1.8rem;
+            transition: all 0.2s ease;
+        }
+        .clap-button.clapped {
+            background-color: var(--bs-primary);
+            color: #fff;
+            transform: scale(1.1);
+        }
+        .clap-bubble {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.25rem 0.75rem;
+            background-color: var(--bs-primary);
+            color: #fff;
+            border-radius: 20px;
+            font-weight: bold;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.6s ease-out;
+        }
+        .clap-bubble.show {
+            opacity: 1;
+            transform: translateY(-60px) translateX(-50%);
+        }
+
+        /* 7. Resumo por IA */
+        .ai-summary-box {
+            background-color: var(--bs-body-bg);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--bs-box-shadow-sm);
+        }
+        .ai-summary-box .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .ai-summary-box .summary-header h5 {
+            font-weight: 700;
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+        }
+        .ai-summary-box .summary-header .bi-magic {
+            color: var(--bs-primary);
+            margin-right: 0.5rem;
+        }
+        .ai-summary-box .summary-content {
+            font-size: 1rem;
+            color: var(--bs-secondary-color);
+            padding-top: 1rem;
+            margin-top: 1rem;
+            border-top: 1px solid var(--bs-border-color);
+        }
+
+        /* 8. Comentários */
+        .comments-section {
+            padding: 2rem 0;
+        }
+        .comment {
+            display: flex;
+            margin-bottom: 1.5rem;
+        }
+        .comment img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 1rem;
+        }
+        .comment-body {
+            background-color: var(--bs-body-bg);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            flex-grow: 1;
+        }
+        .comment-body strong {
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+        .comment-actions {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+        .comment-actions a {
+            text-decoration: none;
+            margin-right: 1rem;
+            font-weight: 600;
+        }
+        .comment-reply {
+            margin-left: 3.5rem; /* Alinha com o corpo do comentário pai */
+        }
+        
+        /* 9. Botão Flutuante do Chatbot de IA */
+        .ai-chat-fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background-color: var(--bs-primary);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: var(--bs-box-shadow-lg);
+            cursor: pointer;
+            z-index: 1040;
+            transition: transform 0.2s;
+        }
+        .ai-chat-fab:hover {
+            transform: scale(1.1);
+        }
+
+        /* 10. Modal do Chatbot de IA */
+        .chat-modal .modal-body {
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-modal .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background-color: var(--bs-tertiary-bg);
+            border-radius: 0.5rem;
+        }
+        .chat-message {
+            margin-bottom: 1rem;
+            max-width: 80%;
+        }
+        .chat-message p {
+            background-color: var(--bs-body-bg);
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            margin-bottom: 0.25rem;
+            box-shadow: var(--bs-box-shadow-sm);
+        }
+        .chat-message.user {
+            margin-left: auto; /* Alinha à direita */
+        }
+        .chat-message.user p {
+            background-color: var(--bs-primary);
+            color: #fff;
+        }
+        .chat-message.bot p {
+            border: 1px solid var(--bs-border-color);
+        }
+        .chat-message span {
+            font-size: 0.8rem;
+            color: var(--bs-secondary-color);
+            padding: 0 0.5rem;
+        }
+        .chat-input {
+            margin-top: 1rem;
+        }
+
+        /* 11. Pop-up "Simplificar Texto" */
+        #text-simplifier-popup {
+            position: absolute;
+            background-color: var(--bs-dark);
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 1050;
+            display: none; /* Oculto por padrão */
+            box-shadow: var(--bs-box-shadow-lg);
+        }
+        #text-simplifier-popup .bi {
+            margin-right: 0.5rem;
+        }
+
+    </style>
+</head>
+<body class="bg-body-tertiary" data-bs-spy="scroll" data-bs-target="#toc-nav" data-bs-offset="160">
+
+    <!-- Barra de Progresso -->
+    <div class="progress-bar-container" id="reading-progress-bar"></div>
+
+    <!-- 1. Header Dinâmico -->
+    <nav class="navbar navbar-expand-lg bg-body navbar-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">BlogModerno</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="all-posts.html">Artigos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Sobre</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-outline-secondary rounded-circle p-2 lh-1 me-2" id="theme-toggle" type="button" aria-label="Toggle theme">
+                        <i class="bi bi-sun-fill fs-5"></i>
+                        <i class="bi bi-moon-stars-fill fs-5"></i>
+                    </button>
+                    <a href="login.html" class="btn btn-primary rounded-pill px-3">Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 2. Conteúdo Principal -->
+    <div class="container" style="margin-top: 6rem;"> <!-- Margem para compensar navbar fixo -->
+        <div class="row g-5">
+            
+            <!-- 2a. Coluna do Artigo -->
+            <div class="col-lg-8" id="article-content-wrapper"> <!-- Wrapper para barra de progresso -->
+                
+                <!-- Cabeçalho do Post -->
+                <header class="post-header">
+                    <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill mb-3">CSS</span>
+                    <h1 class="display-5 fw-bold mb-3">Dominando as Novas Viewport Units: svh, lvh e dvh</h1>
+                    <div class="d-flex align-items-center text-muted small">
+                        <img src="https://placehold.co/40x40/ccc/333?text=BR" alt="Avatar do autor" class="rounded-circle me-2" onerror="this.src='https://placehold.co/40x40';this.onerror=null;">
+                        <span>Por <strong>Bruno Ramos</strong> • 22 de Outubro, 2025 • 5 min de leitura</span>
+                    </div>
+
+                    <!-- Botões de Tradução (Layout) -->
+                    <div class="d-flex gap-2 mt-4">
+                        <button class="btn btn-sm btn-outline-secondary" disabled>
+                            <i class="bi bi-translate me-1"></i> Traduzir para:
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary">English</button>
+                        <button class="btn btn-sm btn-outline-secondary">Español</button>
+                    </div>
+                </header>
+
+                <!-- Imagem de Destaque -->
+                <img src="https://placehold.co/1200x600/22A699/FFFFFF?text=CSS+Viewport+Units" alt="Imagem de destaque do artigo" class="img-fluid rounded-3 mb-4" onerror="this.src='https://placehold.co/1200x600';this.onerror=null;">
+
+                <!-- Conteúdo do Artigo -->
+                <article class="post-content" id="article-main-content"> <!-- ID para seleção de texto -->
+                    <p class="lead">Por anos, desenvolvedores web tiveram uma relação de amor e ódio com <code>100vh</code>. A promessa era simples: 100% da altura da viewport. Mas em dispositivos móveis, barras de navegação e menus que aparecem e desaparecem transformaram isso em um pesadelo.</p>
+
+                    <p>Quando a barra de navegação inferior do seu navegador móvel está visível, o <code>100vh</code> é maior do que o espaço visível real, causando rolagem indesejada. Quando ela se retrai, o layout "salta". Felizmente, o W3C nos deu novas unidades para resolver exatamente isso.</p>
+
+                    <h2 id="section1">O Problema com '100vh'</h2>
+                    <p>A unidade <code>vh</code> (viewport height) é definida como 1% da altura da *maior viewport possível*. Em um celular, isso inclui a área "atrás" das barras de ferramentas do navegador (a barra de endereço no topo e a barra de navegação na base). Isso significa que um elemento com <code>height: 100vh</code> frequentemente transborda da área visível.</p>
+                    <pre><code>.elemento-problematico {
+    height: 100vh; /* Isso pode ser maior que a tela visível! */
+}</code></pre>
+
+                    <h2 id="section2">A Solução: Pequeno, Grande e Dinâmico</h2>
+                    <p>Para nos dar controle total, agora temos três novas unidades de altura da viewport:</p>
+                    <ul>
+                        <li><strong>Small Viewport Height (<code>svh</code>)</strong>: 1% da altura da viewport "pequena". Isso é a área visível quando todas as barras de ferramentas do navegador estão expandidas (visíveis). Use <code>100svh</code> quando você *nunca* quiser que seu elemento cause rolagem.</li>
+                        <li><strong>Large Viewport Height (<code>lvh</code>)</strong>: 1% da altura da viewport "grande". Esta é a área visível quando as barras de ferramentas estão retraídas. <code>100lvh</code> é o mais próximo do antigo comportamento de <code>100vh</code>.</li>
+                        <li><strong>Dynamic Viewport Height (<code>dvh</code>)</strong>: 1% da altura da viewport "dinâmica". Esta é a unidade mágica: ela se ajusta *automaticamente* conforme as barras de ferramentas aparecem e desaparecem. É perfeita para elementos que devem preencher exatamente o espaço visível, mas pode ter um custo de performance se usada em excesso, já que o navegador precisa recalcular o layout.</li>
+                    </ul>
+
+                    <h2 id="section3">Qual usar e Quando?</h2>
+                    <p>Aqui está um guia rápido:</p>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Unidade</th>
+                                <th>Quando Usar</th>
+                                <th>Exemplo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>100svh</code></td>
+                                <td>Para telas de splash ou modais que devem caber perfeitamente na menor área visível.</td>
+                                <td><code>.modal { height: 100svh; }</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>100lvh</code></td>
+                                <td>Quando você quer o máximo de altura possível, mesmo que cause rolagem inicial.</td>
+                                <td><code>.hero-section { height: 100lvh; }</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>100dvh</code></td>
+                                <td>Para interfaces de apps (como um mapa) que devem se ajustar dinamicamente às barras de ferramentas.</td>
+                                <td><code>.app-wrapper { height: 100dvh; }</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p>A adoção dessas novas unidades é um grande passo para a consistência no design responsivo e uma vitória para a experiência do usuário em dispositivos móveis.</p>
+                </article>
+
+                <!-- 3a. Botão de "Palmas" -->
+                <div class="clap-wrapper text-center my-5 position-relative">
+                    <button class="btn btn-outline-primary rounded-circle clap-button" id="clap-button" data-bs-toggle="tooltip" title="Gostou? Dê palmas!">
+                        <i class="bi bi-hand-clapping"></i>
+                    </button>
+                    <span id="clap-count" class="ms-2 fs-4 align-middle fw-bold text-primary">0</span>
+                    <div id="clap-bubble" class="clap-bubble">+1</div>
+                </div>
+
+                <!-- 3b. RESUMO COM IA (Oculto por padrão) -->
+                <div class="ai-summary-box">
+                    <div class="summary-header">
+                        <h5><i class="bi bi-magic"></i> Resumo por IA</h5>
+                        <button class="btn btn-outline-primary btn-sm" id="toggle-summary-btn" data-bs-toggle="collapse" data-bs-target="#summary-content">
+                            Mostrar Resumo
+                        </button>
+                    </div>
+                    <div class="collapse" id="summary-content">
+                        <div class="summary-content">
+                            <p class="placeholder-glow">
+                                <span class="placeholder col-12"></span>
+                                <span class="placeholder col-10"></span>
+                            </p>
+                            <!-- O conteúdo real da IA será inserido aqui -->
+                            <p id="ai-summary-text" class="d-none">
+                                Este artigo resolve o problema de design responsivo causado pelo <code>100vh</code> em dispositivos móveis, onde as barras de navegação dinâmicas criam layouts instáveis. Ele introduz três novas unidades de viewport: <code>svh</code> (menor área visível), <code>lvh</code> (maior área) e <code>dvh</code> (altura dinâmica que se ajusta). O texto orienta sobre quando usar cada unidade (<code>svh</code> para modais, <code>lvh</code> para seções hero e <code>dvh</code> para UIs de apps) para criar experiências de usuário mais consistentes.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3c. Seção de Comentários -->
+                <div class="comments-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="mb-0 fw-bold">Comentários (3)</h3>
+                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#comments-list">
+                            Ocultar Comentários
+                        </button>
+                    </div>
+
+                    <div class="collapse show" id="comments-list">
+                        <!-- Formulário de Novo Comentário -->
+                        <div class="comment-body mb-4 p-3">
+                            <strong>Deixe um comentário</strong>
+                            <textarea class="form-control" rows="3" placeholder="Escreva seu comentário..."></textarea>
+                            <button class="btn btn-primary btn-sm mt-2">Publicar</button>
+                        </div>
+
+                        <!-- Lista de Comentários -->
+                        <div class="comment">
+                            <img src="https://placehold.co/40x40/ddd/333?text=AS" alt="Avatar de Ana Silva" onerror="this.src='https://placehold.co/40x40';this.onerror=null;">
+                            <div class="comment-body">
+                                <strong>Ana Silva</strong>
+                                <p>Finalmente! <code>100dvh</code> é o que eu estava esperando há anos. Ótimo artigo!</p>
+                                <div class="comment-actions">
+                                    <a href="#" class="text-primary">Responder</a>
+                                    <a href="#" class="text-muted">Curtir</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="comment comment-reply">
+                            <img src="https://placehold.co/40x40/ccc/333?text=BR" alt="Avatar de Bruno Ramos" onerror="this.src='https://placehold.co/40x40';this.onerror=null;">
+                            <div class="comment-body">
+                                <strong>Bruno Ramos (Autor)</strong>
+                                <p>Com certeza, Ana! É uma mudança de jogo.</p>
+                                <div class="comment-actions">
+                                    <a href="#" class="text-muted">Curtir</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <img src="https://placehold.co/40x40/bbb/333?text=CR" alt="Avatar de Carla Ribeiro" onerror="this.src='https://placehold.co/40x40';this.onerror=null;">
+                            <div class="comment-body">
+                                <strong>Carla Ribeiro</strong>
+                                <p>Excelente explicação sobre a diferença entre <code>svh</code> e <code>lvh</code>. Eu sempre confundia os dois. Obrigada!</p>
+                                <div class="comment-actions">
+                                    <a href="#" class="text-primary">Responder</a>
+                                    <a href="#" class="text-muted">Curtir</a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div> <!-- Fim do collapse #comments-list -->
+                </div>
+
+            </div>
+
+            <!-- 2b. Coluna da Sidebar -->
+            <div class="col-lg-4">
+                <div class="sticky-top" style="top: 8rem;"> <!-- O 'top: 8rem' compensa o header fixo -->
+                    
+                    <!-- Widget: Tabela de Conteúdo -->
+                    <div class="sidebar-widget">
+                        <h5>Neste Artigo</h5>
+                        <nav id="toc-nav">
+                            <ul class="toc-list nav flex-column">
+                                <li class="nav-item"><a href="#section1" class="nav-link">O Problema com '100vh'</a></li>
+                                <li class="nav-item"><a href="#section2" class="nav-link">A Solução: Pequeno, Grande e Dinâmico</a></li>
+                                <li class="nav-item"><a href="#section3" class="nav-link">Qual usar e Quando?</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+
+                    <!-- Widget: Posts Relacionados -->
+                    <div class="sidebar-widget">
+                        <h5>Relacionados</h5>
+                        <a href="#" class="related-post-item">
+                            <img src="https://placehold.co/150x150/F2BE22/FFFFFF?text=JS" alt="Post relacionado" onerror="this.src='https://placehold.co/150x150';this.onerror=null;">
+                            <div>
+                                <h6>5 Padrões de Design Essenciais em JS</h6>
+                                <span>20 de Outubro, 2025</span>
+                            </div>
+                        </a>
+                        <a href="#" class="related-post-item">
+                            <img src="https://placehold.co/150x150/C147E9/FFFFFF?text=Perf" alt="Post relacionado" onerror="this.src='https://placehold.co/150x150';this.onerror=null;">
+                            <div>
+                                <h6>O Guia Definitivo para Core Web Vitals</h6>
+                                <span>18 de Outubro, 2025</span>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <!-- Widget: Compartilhar -->
+                    <div class="sidebar-widget">
+                        <h5>Compartilhe</h5>
+                        <div class="d-flex fs-4">
+                            <a href="#" class="text-muted me-3"><i class="bi bi-twitter-x"></i></a>
+                            <a href="#" class="text-muted me-3"><i class="bi bi-linkedin"></i></a>
+                            <a href="#" class="text-muted me-3"><i class="bi bi-facebook"></i></a>
+                            <a href="#" class="text-muted"><i class="bi bi-link-45deg"></i></a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 3. Footer -->
+    <footer class="footer py-5 mt-5 border-top">
+        <div class="container text-center text-muted small">
+            <p>© 2025 BlogModerno. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- 4. Botão Flutuante do Chatbot de IA -->
+    <div class="ai-chat-fab" data-bs-toggle="modal" data-bs-target="#aiChatModal" data-bs-toggle="tooltip" title="Pergunte ao Artigo">
+        <i class="bi bi-robot"></i>
+    </div>
+
+    <!-- 5. Pop-up "Simplificar Texto" (Oculto) -->
+    <div id="text-simplifier-popup">
+        <i class="bi bi-stars"></i> Simplificar Texto
+    </div>
+
+    <!-- 6. Modais -->
+
+    <!-- Modal do Chatbot de IA -->
+    <div class="modal fade chat-modal" id="aiChatModal" tabindex="-1" aria-labelledby="aiChatModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aiChatModalLabel"><i class="bi bi-robot text-primary me-2"></i> Pergunte ao Artigo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Mensagens -->
+                    <div class="chat-messages" id="chat-messages-container">
+                        <div class="chat-message bot">
+                            <p>Olá! Eu li este artigo. O que você gostaria de saber sobre as novas viewport units?</p>
+                            <span>IA</span>
+                        </div>
+                        <!-- Mensagens dinâmicas entram aqui -->
+                    </div>
+                    <!-- Input -->
+                    <div class="chat-input input-group">
+                        <input type="text" id="chat-user-input" class="form-control" placeholder="Digite sua pergunta...">
+                        <button class="btn btn-primary" type="button" id="chat-send-btn">
+                            <i class="bi bi-send-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal "Simplificar Texto" -->
+    <div class="modal fade" id="simplifier-modal" tabindex="-1" aria-labelledby="simplifierModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="simplifierModalLabel"><i class="bi bi-stars text-primary me-2"></i> Texto Simplificado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Aqui está uma explicação mais simples do texto que você selecionou:</p>
+                    <div class="p-3 bg-body-tertiary rounded">
+                        <p id="simplified-text-content">
+                            <!-- Conteúdo da IA entra aqui -->
+                            <em>"Imagine que <code>100vh</code> é a altura total da tela do seu celular, incluindo as barras de endereço e navegação. Isso faz com que seu site pareça 'maior' do que a área visível, criando uma barra de rolagem chata. As novas unidades corrigem isso!"</em>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <!-- JS Personalizado -->
+    <script>
+        (() => {
+            'use strict';
+            
+            // Inicializa todos os Tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // --- 1. Script do Tema (Dark Mode) ---
+            const getStoredTheme = () => localStorage.getItem('theme');
+            const setStoredTheme = theme => localStorage.setItem('theme', theme);
+            const getPreferredTheme = () => {
+                const storedTheme = getStoredTheme();
+                if (storedTheme) {
+                    return storedTheme;
+                }
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            };
+            const setTheme = theme => {
+                document.documentElement.setAttribute('data-bs-theme', theme);
+            };
+            setTheme(getPreferredTheme());
+            const themeToggleButton = document.getElementById('theme-toggle');
+            if (themeToggleButton) {
+                themeToggleButton.addEventListener('click', () => {
+                    const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    setStoredTheme(newTheme);
+                    setTheme(newTheme);
+                });
+            }
+
+            // --- 2. Script do Header Dinâmico (Kinsta-like) ---
+            const navbar = document.querySelector('.navbar-top');
+            let lastScrollY = window.scrollY;
+            const scrollThreshold = 100;
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > lastScrollY && window.scrollY > scrollThreshold) {
+                    navbar.classList.add('navbar-hidden');
+                } else if (window.scrollY < lastScrollY && window.scrollY > scrollThreshold) {
+                    navbar.classList.remove('navbar-hidden');
+                } else if (window.scrollY <= scrollThreshold) {
+                    navbar.classList.remove('navbar-hidden');
+                }
+                
+                if (window.scrollY > 0) {
+                    navbar.classList.add('navbar-scrolled');
+                } else {
+                    // Remove 'scrolled' e 'hidden' quando no topo
+                    navbar.classList.remove('navbar-scrolled');
+                    navbar.classList.remove('navbar-hidden');
+                }
+                lastScrollY = window.scrollY;
+            }, { passive: true });
+            window.dispatchEvent(new Event('scroll'));
+
+            // --- 3. Script da Barra de Progresso ---
+            const progressBar = document.getElementById('reading-progress-bar');
+            const articleWrapper = document.getElementById('article-content-wrapper');
+            function updateProgressBar() {
+                if (!articleWrapper || !progressBar) return;
+                
+                const wrapperTop = articleWrapper.offsetTop;
+                const wrapperHeight = articleWrapper.offsetHeight;
+                const windowHeight = window.innerHeight;
+                const scrollY = window.scrollY;
+
+                // Calcula o quanto do *artigo* (não da página) foi rolado
+                const scrollableDistanceInArticle = wrapperHeight - windowHeight;
+                const scrolledPastWrapperTop = scrollY - wrapperTop;
+                
+                let percentage = (scrolledPastWrapperTop / scrollableDistanceInArticle) * 100;
+                
+                if (percentage < 0) percentage = 0;
+                if (percentage > 100) percentage = 100;
+                
+                progressBar.style.backgroundSize = percentage + '% 100%';
+            }
+            window.addEventListener('scroll', updateProgressBar, { passive: true });
+            updateProgressBar(); // Chama na carga
+
+            // --- 4. Script de "Palmas" (Claps) ---
+            const clapButton = document.getElementById('clap-button');
+            const clapCountSpan = document.getElementById('clap-count');
+            const clapBubble = document.getElementById('clap-bubble');
+            
+            if (clapButton) {
+                const clapTooltip = bootstrap.Tooltip.getInstance(clapButton);
+                let totalClaps = 0; 
+                let userClaps = 0;
+                const clapLimit = 50;
+                let bubbleTimeout;
+
+                clapButton.addEventListener('click', () => {
+                    if (userClaps >= clapLimit) {
+                        clapButton.setAttribute('data-bs-original-title', 'Limite de palmas atingido!');
+                        clapTooltip.show();
+                        setTimeout(() => {
+                            clapTooltip.hide();
+                            clapButton.setAttribute('data-bs-original-title', 'Gostou? Dê palmas!');
+                        }, 2000);
+                        return;
+                    }
+                    userClaps++;
+                    totalClaps++;
+                    clapCountSpan.textContent = totalClaps;
+                    clapButton.classList.add('clapped');
+                    clapButton.innerHTML = '<i class="bi bi-hand-clapping-fill"></i>';
+                    clapBubble.textContent = `+${userClaps}`;
+                    clapBubble.classList.add('show');
+                    if (bubbleTimeout) clearTimeout(bubbleTimeout);
+                    bubbleTimeout = setTimeout(() => {
+                        clapBubble.classList.remove('show');
+                    }, 600);
+                    clapButton.setAttribute('data-bs-original-title', `Você deu ${userClaps} palmas!`);
+                });
+
+                clapButton.addEventListener('mouseover', () => {
+                    if (userClaps > 0 && userClaps < clapLimit) {
+                        clapButton.setAttribute('data-bs-original-title', `Você deu ${userClaps} palmas!`);
+                    } else if (userClaps >= clapLimit) {
+                        clapButton.setAttribute('data-bs-original-title', 'Limite de palmas atingido!');
+                    }
+                    if(clapTooltip) {
+                        clapTooltip.hide();
+                        clapTooltip.show();
+                    }
+                });
+            }
+
+            // --- 5. Script do Resumo de IA ---
+            const toggleSummaryBtn = document.getElementById('toggle-summary-btn');
+            const summaryCollapse = document.getElementById('summary-content');
+            const summaryText = document.getElementById('ai-summary-text');
+            const summaryPlaceholders = summaryCollapse.querySelectorAll('.placeholder-glow');
+            
+            if (summaryCollapse) {
+                summaryCollapse.addEventListener('show.bs.collapse', () => {
+                    toggleSummaryBtn.textContent = 'Ocultar Resumo';
+                    // Simula o carregamento da IA
+                    summaryPlaceholders.forEach(p => p.style.display = 'block');
+                    summaryText.classList.add('d-none');
+                    
+                    setTimeout(() => {
+                        // Esconde placeholders e mostra o texto
+                        summaryPlaceholders.forEach(p => p.style.display = 'none');
+                        summaryText.classList.remove('d-none');
+                    }, 1500); // Simula 1.5s de loading
+                });
+
+                summaryCollapse.addEventListener('hide.bs.collapse', () => {
+                    toggleSummaryBtn.textContent = 'Mostrar Resumo';
+                });
+            }
+
+            // --- 6. Script do Chatbot (Simulação) ---
+            const chatSendBtn = document.getElementById('chat-send-btn');
+            const chatInput = document.getElementById('chat-user-input');
+            const chatContainer = document.getElementById('chat-messages-container');
+            
+            function addChatMessage(message, sender) {
+                const msgDiv = document.createElement('div');
+                msgDiv.classList.add('chat-message', sender);
+                
+                const msgP = document.createElement('p');
+                msgP.textContent = message;
+                
+                const msgSpan = document.createElement('span');
+                msgSpan.textContent = (sender === 'user') ? 'Você' : 'IA';
+                
+                msgDiv.appendChild(msgP);
+                msgDiv.appendChild(msgSpan);
+                chatContainer.appendChild(msgDiv);
+                
+                // Rola para a última mensagem
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            
+            if (chatSendBtn) {
+                chatSendBtn.addEventListener('click', () => {
+                    const userMessage = chatInput.value;
+                    if (userMessage.trim() === '') return;
+                    
+                    addChatMessage(userMessage, 'user');
+                    chatInput.value = '';
+                    
+                    // Simula resposta da IA
+                    setTimeout(() => {
+                        addChatMessage("Esta é uma ótima pergunta! Com base no artigo, a principal diferença é que 'svh' é a menor altura visível (com barras) e 'dvh' se ajusta dinamicamente.", 'bot');
+                    }, 1000);
+                });
+                
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        chatSendBtn.click();
+                    }
+                });
+            }
+
+            // --- 7. Script do Simplificador de Texto ---
+            const simplifierPopup = document.getElementById('text-simplifier-popup');
+            const articleContent = document.getElementById('article-main-content');
+            const simplifierModal = new bootstrap.Modal(document.getElementById('simplifier-modal'));
+            const simplifiedTextContent = document.getElementById('simplified-text-content');
+
+            if (articleContent && simplifierPopup) {
+                articleContent.addEventListener('mouseup', (e) => {
+                    const selection = window.getSelection();
+                    const selectedText = selection.toString().trim();
+                    
+                    if (selectedText.length > 20) { // Mostra apenas se selecionar algum texto
+                        const range = selection.getRangeAt(0);
+                        const rect = range.getBoundingClientRect();
+                        
+                        // Posição do pop-up
+                        simplifierPopup.style.left = `${window.scrollX + rect.left + (rect.width / 2) - (simplifierPopup.offsetWidth / 2)}px`;
+                        simplifierPopup.style.top = `${window.scrollY + rect.top - simplifierPopup.offsetHeight - 10}px`; // 10px acima
+                        simplifierPopup.style.display = 'block';
+                        
+                        // Armazena o texto para o modal
+                        simplifierPopup.dataset.selectedText = selectedText;
+                        
+                    } else {
+                        simplifierPopup.style.display = 'none';
+                    }
+                });
+
+                // Esconde o pop-up se clicar fora do artigo
+                document.addEventListener('mousedown', (e) => {
+                    if (!articleContent.contains(e.target) && e.target !== simplifierPopup) {
+                        simplifierPopup.style.display = 'none';
+                    }
+                });
+                
+                // Ação de clique no pop-up
+                simplifierPopup.addEventListener('click', () => {
+                    const textToSimplify = simplifierPopup.dataset.selectedText;
+                    
+                    // Simulação de IA: Apenas coloca um texto estático
+                    // (Aqui você chamaria a API do Gemini com o textToSimplify)
+                    simplifiedTextContent.innerHTML = `<em>"Simplificando: <strong>${textToSimplify.substring(0, 50)}...</strong>"</em> <br><br> Imagine que o <code>100vh</code> antigo não sabia se as barras do navegador (topo e base) estavam visíveis, causando bugs de layout. As novas unidades corrigem isso: <code>svh</code> sempre vê as barras, <code>lvh</code> nunca vê as barras, e <code>dvh</code> se ajusta quando elas aparecem ou somem.`;
+                    
+                    simplifierModal.show();
+                    simplifierPopup.style.display = 'none';
+                });
+            }
+
+        })();
+    </script>
+
+</body>
+</html>
+

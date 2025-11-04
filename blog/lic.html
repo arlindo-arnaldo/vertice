@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="pt" data-theme="light"> 
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title> Host | Painel </title>
+    
+    <link rel="stylesheet" href="/assets/fonts/boxicons-master/css/boxicons.min.css">
+    <script src="/assets/libs/js/feather.min.js"></script>
+
+    <script type="text/javascript" src="/assets/assets/js/script.js" defer></script>
+    
+    <style>
+        [wire\:loading][wire\:loading],
+        [wire\:loading\.delay][wire\:loading\.delay],
+        [wire\:loading\.inline-block][wire\:loading\.inline-block],
+        [wire\:loading\.inline][wire\:loading\.inline],
+        [wire\:loading\.block][wire\:loading\.block],
+        [wire\:loading\.flex][wire\:loading\.flex],
+        [wire\:loading\.table][wire\:loading\.table],
+        [wire\:loading\.grid][wire\:loading\.grid],
+        [wire\:loading\.inline-flex][wire\:loading\.inline-flex] {
+            display: none;
+        }
+        [wire\:loading\.delay\.none][wire\:loading\.delay\.none],
+        [wire\:loading\.delay\.shortest][wire\:loading\.delay\.shortest],
+        [wire\:loading\.delay\.shorter][wire\:loading\.delay\.shorter],
+        [wire\:loading\.delay\.short][wire\:loading\.delay\.short],
+        [wire\:loading\.delay\.default][wire\:loading\.delay\.default],
+        [wire\:loading\.delay\.long][wire\:loading\.delay\.long],
+        [wire\:loading\.delay\.longer][wire\:loading\.delay\.longer],
+        [wire\:loading\.delay\.longest][wire\:loading\.delay\.longest] {
+            display: none;
+        }
+        [wire\:offline][wire\:offline] {
+            display: none;
+        }
+        [wire\:dirty]:not(textarea):not(input):not(select) {
+            display: none;
+        }
+        :root {
+            --livewire-progress-bar-color: #2299dd;
+        }
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+    
+    <style>
+        /* 1. Reset e Fontes */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --primary-color: #0d6efd; /* Azul mais moderno */
+            --primary-color-light: rgba(13, 110, 253, 0.1);
+            --danger-color: #dc3545;
+            --success-color: #198754;
+            --transition-speed: 0.2s ease-in-out;
+        }
+
+        /* 2. Variáveis de Tema (Light & Dark) */
+        [data-theme="light"] {
+            --bg-body: #f4f7fa;
+            --bg-sidebar: #ffffff;
+            --bg-content: #ffffff;
+            --bg-header: #f9fafb;
+            --bg-input: #ffffff;
+            --bg-input-focus: #ffffff;
+            --bg-hover: #f0f0f0;
+
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-placeholder: #9ca3af;
+            --text-inverted: #ffffff;
+
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #111827;
+            --bg-sidebar: #1f2937;
+            --bg-content: #1f2937;
+            --bg-header: #374151;
+            --bg-input: #374151;
+            --bg-input-focus: #4b5563;
+            --bg-hover: #374151;
+
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-placeholder: #6b7280;
+            --text-inverted: #111827;
+
+            --border-color: #374151;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 3. Estilos Base do Body */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            display: flex; /* Para layout de sidebar */
+        }
+
+        /* 4. Layout Principal (Sidebar + Main) */
+        
+        /* --- Sidebar (Menu) --- */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: width var(--transition-speed);
+            z-index: 100;
+        }
+
+        .sidebar.close {
+            width: 88px; /* Tamanho do ícone + padding */
+        }
+
+        .sidebar header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            height: 70px;
+        }
+        
+        .sidebar.close header .image-text {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .sidebar header .image {
+            width: 40px;
+            height: 40px;
+            overflow: hidden;
+            border-radius: 6px;
+        }
+        .sidebar header .image img {
+            width: 100%;
+        }
+
+        .sidebar header .toggle {
+            font-size: 24px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: transform var(--transition-speed);
+        }
+        
+        .sidebar.close header .toggle {
+            transform: translateX(10px) rotate(180deg);
+        }
+        
+        .sidebar .menu-bar {
+            flex-grow: 1;
+            overflow-y: auto; /* Permite scroll se os links não couberem */
+            padding: 16px 0;
+        }
+
+        .sidebar .menu-links {
+            list-style: none;
+            padding: 0 16px;
+        }
+        
+        .sidebar .nav-link a {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            white-space: nowrap; /* Impede quebra de linha */
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+            margin-bottom: 4px;
+        }
+        
+        .sidebar .nav-link a:hover {
+            background-color: var(--bg-header);
+            color: var(--text-primary);
+        }
+        
+        .sidebar .nav-link.active a {
+            background-color: var(--primary-color-light);
+            color: var(--primary-color);
+        }
+        
+        [data-theme="dark"] .sidebar .nav-link.active a {
+             background-color: var(--primary-color);
+             color: var(--text-inverted);
+        }
+        
+        .sidebar .nav-link .icon {
+            font-size: 20px;
+            min-width: 40px; /* Alinha os textos */
+            stroke-width: 2.5px;
+        }
+        
+        .sidebar .nav-link .text {
+            opacity: 1;
+            transition: opacity var(--transition-speed);
+        }
+        
+        .sidebar.close .nav-link .text {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .sidebar hr {
+            margin: 16px;
+            border: none;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* --- Main Content --- */
+        .main {
+            position: relative;
+            left: 260px;
+            width: calc(100% - 260px);
+            min-height: 100vh;
+            background-color: var(--bg-body);
+            padding: 24px;
+            transition: left var(--transition-speed), width var(--transition-speed);
+        }
+        
+        .sidebar.close ~ .main {
+            left: 88px;
+            width: calc(100% - 88px);
+        }
+
+        /* 5. Header (Topo da Página) */
+        .nav-main {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            height: 70px;
+            margin: -24px -24px 24px -24px; /* Preenche topo */
+            padding: 0 24px;
+            background-color: var(--bg-content);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-main-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            list-style: none;
+        }
+
+        .dark-mode-switch {
+            font-size: 22px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        
+        .dark-mode-switch .icon-sun { display: none; }
+        .dark-mode-switch .icon-moon { display: block; }
+        [data-theme="dark"] .dark-mode-switch .icon-sun { display: block; }
+        [data-theme="dark"] .dark-mode-switch .icon-moon { display: none; }
+        
+        .nav-main-user .user {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--border-color);
+            background-image: url('https://ui-avatars.com/api/?name=Admin&background=0d6efd&color=fff'); /* Placeholder */
+        }
+        
+        /* 6. Content Card (Container Principal) */
+        .wrap.home-painel {
+            background-color: var(--bg-content);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+        
+        /* 7. Elementos de UI (Botões, Inputs, Títulos) */
+        
+        /* --- Títulos --- */
+        h5 {
+            font-size: 1.75rem; /* 28px */
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+        }
+        
+        /* --- Botões --- */
+        .btn {
+            display: inline-block;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            white-space: nowrap;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--text-inverted);
+            border-color: var(--primary-color);
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        /* Botão original 'page-link' agora é um .btn-primary */
+        button.page-link {
+            /* Herda do .btn-primary */
+        }
+        
+        /* --- Inputs e Formulários --- */
+        .form-control,
+        input[type="text"],
+        input[type="email"],
+        select {
+            display: block;
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 14px;
+            font-family: var(--font-sans);
+            color: var(--text-primary);
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+        }
+        
+        .form-control:focus,
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
+            background-color: var(--bg-input-focus);
+        }
+        
+        .form-control::placeholder,
+        input[type="text"]::placeholder {
+            color: var(--text-placeholder);
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        /* --- Input de Busca (no topo da tabela) --- */
+        .search-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 24px 0 16px 0;
+            gap: 16px;
+        }
+        
+        .search-container .search-input {
+            width: 100%;
+            max-width: 400px; /* Limita o tamanho */
+            margin-left: auto; /* Alinha à direita */
+        }
+
+        /* 8. Tabela */
+        .table-container {
+            width: 100%;
+            overflow-x: auto; /* Permite scroll horizontal em telas pequenas */
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+        
+        .table-custom {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .table-custom th,
+        .table-custom td {
+            padding: 12px 16px;
+            text-align: left;
+            white-space: nowrap; /* Evita quebra de linha */
+        }
+
+        .table-custom thead {
+            background-color: var(--bg-header);
+        }
+        
+        .table-custom th {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .table-custom tbody tr {
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .table-custom tbody tr:hover {
+            background-color: var(--bg-header);
+        }
+        
+        .table-custom td {
+            color: var(--text-primary);
+        }
+        
+        .table-custom td a {
+            color: var(--primary-color);
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .table-custom td a:hover {
+            text-decoration: underline;
+        }
+
+        /* Botão 'Ver' na tabela */
+        .btn-custom.btn-custom-primary {
+            display: inline-block;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            background-color: var(--primary-color-light);
+            color: var(--primary-color);
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all var(--transition-speed);
+        }
+        .btn-custom.btn-custom-primary:hover {
+            background-color: var(--primary-color);
+            color: var(--text-inverted);
+        }
+        [data-theme="dark"] .btn-custom.btn-custom-primary {
+            background-color: var(--bg-input);
+        }
+        [data-theme="dark"] .btn-custom.btn-custom-primary:hover {
+            background-color: var(--primary-color);
+            color: var(--text-inverted);
+        }
+
+        /* 9. Paginação */
+        .pagination-container {
+            display: flex;
+            justify-content: flex-end;
+            padding-top: 20px;
+        }
+
+        ul.pagination {
+            display: flex;
+            list-style: none;
+            gap: 8px;
+        }
+
+        li.page-item .page-link,
+        li.page-item span.page-link {
+            display: block;
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-content);
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all var(--transition-speed);
+        }
+        
+        li.page-item button.page-link {
+            background-color: var(--primary-color);
+            color: var(--text-inverted);
+            border-color: var(--primary-color);
+        }
+        
+        li.page-item.disabled span.page-link {
+            background-color: var(--bg-header);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+        
+        li.page-item button.page-link:hover {
+            opacity: 0.9;
+        }
+        
+        li.page-item .page-link:not(button):hover {
+            background-color: var(--bg-header);
+        }
+        
+        /* 10. Modal */
+        dialog {
+            width: 90%;
+            max-width: 500px;
+            padding: 0;
+            background-color: var(--bg-content);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-speed);
+        }
+        
+        dialog::backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(3px);
+        }
+
+        dialog .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        dialog .header .content-container {
+            font-size: 1.125rem; /* 18px */
+            font-weight: 600;
+        }
+        
+        dialog .header .close-container {
+            font-size: 24px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            line-height: 1;
+        }
+        dialog .header .close-container:hover {
+            color: var(--text-primary);
+        }
+        
+        dialog .body {
+            padding: 24px;
+        }
+        
+        /* Grupo de input para o subdomínio */
+        .input-group {
+            display: flex;
+        }
+        .input-group input {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            flex-grow: 1;
+        }
+        .input-group .input-group-text {
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background-color: var(--bg-header);
+            border: 1px solid var(--border-color);
+            border-left: 0;
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        
+        dialog .footer {
+            display: flex;
+            justify-content: flex-end;
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--bg-header);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        dialog .footer button {
+            /* Usa as classes .btn .btn-primary */
+        }
+        
+        /* Alertas (do seu código original) */
+        .alert-success, .alert-danger {
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 16px 0;
+            color: #ffffff;
+            font-weight: 500;
+        }
+        .alert-success {
+            background-color: var(--success-color);
+        }
+        .alert-danger {
+            background-color: var(--danger-color);
+        }
+        
+        /* Offline status */
+        .offline-status {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 8px;
+            text-align: center;
+            font-weight: 500;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+    </style>
+    </head>
+
+<body>
+
+    <nav class="sidebar close"> <header>
+            <div class="image-text">
+                <span class="image skeleton">
+                    <img src="/assets/assets/img/logo/favicon.png" alt="logo" class="skeleton favicon">
+                </span>
+                </div>
+            <i class="bx bx-chevron-left toggle"></i>
+        </header>
+
+        <div class="menu-bar">
+            <div class="menu">
+                <ul class="menu-links">
+                    <li class="nav-link ">
+                        <a href="https://gestaodesoftware.calungasoft.app" class="skeleton">
+                            <i data-feather="home" class="icon"></i>
+                            <span class="text nav-text">Inicio</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-link active">
+                        <a href="https://gestaodesoftware.calungasoft.app/sites" class="skeleton">
+                            <i data-feather="hard-drive" class="icon"></i>
+                            <span class="text nav-text">Empresas</span>
+                        </a>
+                    </li>
+                    <li class="nav-link ">
+                        <a href="https://gestaodesoftware.calungasoft.app/licenses" class="skeleton">
+                            <i data-feather="award" class="icon"></i>
+                            <span class="text nav-text">Licenças</span>
+                        </a>
+                    </li>
+                    
+                    <hr>
+
+                    <li class="nav-link ">
+                        <a href="https://gestaodesoftware.calungasoft.app/systems" class="skeleton">
+                            <i data-feather="monitor" class="icon"></i>
+                            <span class="text nav-text">Sistemas</span>
+                        </a>
+                    </li>
+                    <li class="nav-link ">
+                        <a href="https://gestaodesoftware.calungasoft.app/plans/systems" class="skeleton"
+                            title="Gestão de Planos">
+                            <i data-feather="dollar-sign" class="icon"></i>
+                            <span class="text nav-text">Gestão de Planos</span>
+                        </a>
+                    </li>
+                    <li class="nav-link ">
+                        <a href="https://gestaodesoftware.calungasoft.app/domains" class="skeleton">
+                            <i data-feather="globe" class="icon"></i>
+                            <span class="text nav-text">Domínios</span>
+                        </a>
+                    </li>
+                    <li class="nav-link ">
+                        <a href="https://gestaodesoftware.calungasoft.app/db-config" class="skeleton"
+                            title="Base de Dados">
+                            <i data-feather="database" class="icon"></i>
+                            <span class="text nav-text">Bases de Dados</span>
+                        </a>
+                    </li>
+                    
+                    <hr>
+                    
+                    <li class="nav-link ">
+                        <a href="https://gestaodesoftware.calungasoft.app/users" class="skeleton">
+                            <i data-feather="user" class="icon"></i>
+                            <span class="text nav-text">Usuários</span>
+                        </a>
+                    </li>
+                    <li class="nav-link ">
+                        <a href="" class="skeleton"
+                            onclick="event.preventDefault(); document.querySelector('#logoutForm').submit();">
+                            <i data-feather="log-out" class="icon"></i>
+                            <span class="text nav-text">Terminar Sessão</span>
+                        </a>
+                        <form method="POST" action="https://gestaodesoftware.calungasoft.app/logout" id="logoutForm">
+                            <input type="hidden" name="_token" value="MbToC3VcGxKleLTAJijCD1sKaex8gPQROP0PCUZY"
+                                autocomplete="off">
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="nav-main">
+            <ul class="nav-main-content">
+                <li class="dark-mode-switch" title="Mudar o tema">
+                    <i class="bx bx-moon icon-moon"></i>
+                    <i class="bx bx-sun icon-sun"></i>
+                </li>
+                
+                <li class="nav-main-user">
+                    <div class="user"></div>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="offline-status" wire:offline>
+            Você não tem conexão com a internet
+        </div>
+
+        <div wire:snapshot="{...}" wire:effects="{...}" wire:id="2RUUfs7BpuzedT68g6ZX">
+            
+            <section class="wrap home-painel">
+                
+                <h5>Sites</h5>
+
+                <div>
+                    <button class="btn btn-primary" wire:click="openAddModal()">Novo Link</button>
+                </div>
+
+                <div>
+                    <br>
+                    <div style="text-align: center">
+                        </div>
+                </div>
+
+                <dialog id="modalAlterLicense" wire:ignore.self>
+                    <div class="header">
+                        <div class="content-container">
+                            Adicionando Nova Empresa
+                        </div>
+                        <div class="close-container" title="Fechar">&times;</div>
+                    </div>
+                    <form action="https://gestaodesoftware.calungasoft.app/config/create-website" method="POST">
+                        <div class="body">
+                                <input type="hidden" name="_token" value="MbToC3VcGxKleLTAJijCD1sKaex8gPQROP0PCUZY" autocomplete="off">
+                                
+                                <div class="form-group">
+                                    <label for="company_name">Nome</label>
+                                    <input type="text" id="company_name" class="form-control" required name="company_name">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="system">Sistema</label>
+                                    <select name="system" id="system" class="form-control" required>
+                                        <option value="1">Gestão Escolar</option>
+                                        <option value="2">Centro de Formação</option>
+                                        <option value="3">Facturação</option>
+                                        <option value="4">Gestão Hospitalar</option>
+                                        <option value="5">Gestão de Recursos Humanos</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="subdomain">Subdomínio</label>
+                                    <div class="input-group">
+                                        <input type="text" id="subdomain" class="form-control" required name="subdomain" style="width: auto;">
+                                        <span class="input-group-text">.calungasoft.app</span>
+                                    </div>
+                                </div>
+                        </div>
+                        <div class="footer">
+                            <button class="btn btn-primary" type="submit">
+                                Salvar
+                            </button>
+                        </div>
+                    </form>
+                </dialog>
+
+                <div class="search-container">
+                    <input type="text" wire:model.live="search"
+                        class="form-control search-input"
+                        placeholder="Buscar empresa...">
+                </div>
+
+                <div class="table-container">
+                    <table class="table-custom">
+                        <thead>
+                            <tr>
+                                <th>Empresa</th>
+                                <th>Sistema</th>
+                                <th>Último acesso</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr title="Escola Jardim De Rosas">
+                                <td><a href="https://escolajardimderosas.calungasoft.app" target="blank">Escola Jardim De
+                                        Rosas</a></td>
+                                <td><span>Gestão Escolar</span></td>
+                                <td><span>24 Oct. 2025 07:40 </span></td>
+                                <td><a href="https://gestaodesoftware.calungasoft.app/sites/calungasoft.app/escolajardimderosas"
+                                        class="btn-custom btn-custom-primary">Ver</a></td>
+                            </tr>
+                            <tr title="AR DE CHIMBILUNDO(SU)LDA E RESTAURANTE DO MINISTRO">
+                                <td><a href="https://restaurantedoministro.calungasoft.app" target="blank">AR DE
+                                        CHIMBILUNDO(SU)LDA...</a></td>
+                                <td><span>Facturação</span></td>
+                                <td><span>23 Oct. 2025 08:28 </span></td>
+                                <td><a href="https://gestaodesoftware.calungasoft.app/sites/calungasoft.app/restaurantedoministro"
+                                        class="btn-custom btn-custom-primary">Ver</a></td>
+                            </tr>
+                            <tr title="R'Matadi comércio e serviços (SU) Lda">
+                                <td><a href="https://rmatadi.calungasoft.app" target="blank">R'Matadi comércio e
+                                        serviços (SU) Lda</a></td>
+                                <td><span>Facturação</span></td>
+                                <td><span>22 Oct. 2025 10:08 </span></td>
+                                <td><a href="https://gestaodesoftware.calungasoft.app/sites/calungasoft.app/rmatadi"
+                                        class="btn-custom btn-custom-primary">Ver</a></td>
+                            </tr>
+                            <tr title="Oznoid">
+                                <td><a href="https://oznoid.calungasoft.app" target="blank">Oznoid</a></td>
+                                <td><span>Facturação</span></td>
+                                <td><span>22 Oct. 2025 09:12 </span></td>
+                                <td><a href="https://gestaodesoftware.calungasoft.app/sites/calungasoft.app/oznoid"
+                                        class="btn-custom btn-custom-primary">Ver</a></td>
+                            </tr>
+                            <tr title="ELECTROCAT COMÉRCIO E SERVIÇO SU">
+                                <td><a href="https://electrocat.calungasoft.app" target="blank">ELECTROCAT COMÉRCIO E
+                                        SERVIÇO SU</a></td>
+                                <td><span>Facturação</span></td>
+                                <td><span>22 Oct. 2025 08:28 </span></td>
+                                <td><a href="https://gestaodesoftware.calungasoft.app/sites/calungasoft.app/electrocat"
+                                        class="btn-custom btn-custom-primary">Ver</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination-container">
+                    <div>
+                        <nav>
+                            <ul class="pagination">
+                                <li class="page-item disabled" aria-disabled="true">
+                                    <span class="page-link">&laquo; Anterior</span>
+                                </li>
+                                
+                                <li class="page-item">
+                                    <button type="button" dusk="nextPage" class="page-link"
+                                        wire:click="nextPage('page')"
+                                        x-on:click="($el.closest('body') || document.querySelector('body')).scrollIntoView()"
+                                        wire:loading.attr="disabled">Próximo &raquo;</button>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+
+        <script>
+            var modal = document.querySelector('#modalAlterLicense');
+            var closeButton = document.querySelector('#modalAlterLicense .close-container');
+
+            if (closeButton) {
+                closeButton.addEventListener('click', function () {
+                    modal.close();
+                });
+            }
+
+            function abrir() {
+                if(modal) modal.showModal();
+            }
+
+            document.addEventListener('openModal', function (e) {
+                if(modal) modal.showModal();
+            });
+            
+            document.addEventListener('closeModal', function (e) {
+                if(modal) modal.close();
+            });
+            
+            // Fechar ao clicar no backdrop (fora do modal)
+            if (modal) {
+                modal.addEventListener('click', function(event) {
+                    if (event.target === modal) {
+                        modal.close();
+                    }
+                });
+            }
+        </script>
+    </main>
+
+    <script>
+        feather.replace();
+    </script>
+    <script src="/livewire/livewire.js?id=951e6947" data-csrf="MbToC3VcGxKleLTAJijCD1sKaex8gPQROP0PCUZY"
+        data-update-uri="/livewire/update" data-navigate-once="true"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const themeSwitch = document.querySelector('.dark-mode-switch');
+            const htmlElement = document.documentElement; // Seleciona o <html>
+
+            // Função para aplicar o tema
+            const setTheme = (theme) => {
+                htmlElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+            };
+
+            // 1. Verifica o localStorage
+            let currentTheme = localStorage.getItem('theme');
+
+            // 2. Se não houver, verifica a preferência do sistema
+            if (!currentTheme) {
+                currentTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            // 3. Aplica o tema
+            setTheme(currentTheme);
+
+            // 4. Adiciona o Event Listener para o clique no switch
+            if (themeSwitch) {
+                themeSwitch.addEventListener('click', () => {
+                    const newTheme = htmlElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                    setTheme(newTheme);
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>
