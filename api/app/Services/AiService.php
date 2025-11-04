@@ -9,6 +9,7 @@ class AiService
 {
     public function summarize(Post $post)
     {
+        info('oi');
         SummarizePost::dispatch($post);
     }
 
